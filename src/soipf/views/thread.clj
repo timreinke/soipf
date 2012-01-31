@@ -1,26 +1,40 @@
 (ns soipf.views.thread
-  (:require [soipf.views.common :as common])
+  (:require [soipf.views.common :as common]
+            [noir.validation :as vali])
   (:use [noir.core :only [defpage defpartial pre-route render]]
         [noir.response :only [redirect]]
         [hiccup.form-helpers]
         [soipf.models.thread :only [get-thread-listing create-thread]]
         [soipf.models.user :only [logged-in?]]))
 
+(defn error-class [field]
+  (str "control-group"
+       (if (vali/errors? field)
+         " error")))
+
+(defn error-help [field]
+  (vali/on-error field (fn [es] (list [:br] [:span.help-inline (first es)]))))
+
 (defpartial new-thread [{:keys [title body]}]
-  (form-to {:class "well"} [:post "/thread/new"]
+  (form-to {:class "form-horizontal"} [:post "/thread/new"]
            [:legend "New Thread"]
+           [:div {:class (error-class :title)}
+            [:label {:for "title"} "Title"]
+            [:div.controls
+             (text-field {:class "input-xlarge"} :title title)
+             (error-help :title)]]
 
-           [:label {:for "title"} "Title"]
-           (text-field :title title)
-
-           [:label {:for "body"} "Body"]
-           ;; TODO: create this style
-
-           [:textarea#body.input-xxxlarge
-            {:name "body" :rows 6 :style "width: 100%; max-width: 250px;"}
-            body]
-           [:div
+           [:div {:class (error-class :body)}
+            [:label {:for "body"} "Body"]
+            ;; TODO: create this style
+            [:div.controls
+             [:textarea#body.input-xlarge
+              {:name "body" :rows 6 }
+              body]
+             (error-help :body)]]
+           [:div.form-actions
             [:button.btn.primary {:type "submit"} "Create Thread"]]))
+
 
 (defpartial display-thread-listing [threads]
   (if (empty? threads)
