@@ -1,15 +1,15 @@
 (ns soipf.views.thread
   (:require [noir.validation :as vali])
-  (:use [noir.core :only [defpage defpartial pre-route render]]
-        [noir.response :only [redirect]]
+  (:use noir.core
+        [noir.response :only [redirect status json]]
         [hiccup.form-helpers]
         [hiccup.page-helpers]
         [soipf.views.common]
-        [soipf.models.thread :only [get-thread-listing create-thread]]
+        [soipf.models.thread :only [get-thread-listing create-thread retrieve-thread]]
         [soipf.models.user :only [logged-in?]]))
 
 (defpartial new-thread [{:keys [title body]}]
-  (form-to {:class "form-horizontal"} [:post "/thread/new"]
+  (form-to {:class "form-horizontal"} [:post "/thread"]
            [:legend "New Thread"]
            [:div {:class (error-class :title)}
             [:label {:for "title"} "Title"]
@@ -30,7 +30,7 @@
 
 (defpartial list-thread [{:keys [_id title author created-at updated-at reply-count]}]
   [:tr
-   [:td title]
+   [:td (link-to (url-for show-thread {:id _id}) title)]
    [:td author]
    [:td (date-str created-at)]
    [:td reply-count]])
@@ -52,17 +52,22 @@
 (defpage "/" []
   (layout
    [:div.row
-    (link-to {:class "btn primary pull-right"} "/thread/new" "New Thread")]
+    (link-to {:class "btn primary pull-right"} "/thread" "New Thread")]
    (thread-listing (get-thread-listing))))
 
-(pre-route "/thread/new" {}
+(pre-route "/thread" {}
            (when-not (logged-in?)
              (redirect "/login")))
 
-(defpage "/thread/new" {:as t}
+(defpage "/thread" {:as t}
   (layout (new-thread t)))
 
-(defpage [:post "/thread/new"] {:keys [title body] :as t}
-  (if (create-thread title body)
-    (layout "success!")
-    (render "/thread/new" t)))
+(defpage [:post "/thread"] {:keys [title body] :as t}
+  (if-let [thread (create-thread title body)]
+    (redirect (url-for show-thread {:id (:_id thread)}))
+    (render "/thread" t)))
+
+(defpage show-thread "/thread/:id" {:keys [id]}
+  (if-let [{:keys [_id title author created-at posts] :as thread} (retrieve-thread id)]
+    (layout )
+    (status 404 (layout "Thread not found"))))
