@@ -1,7 +1,8 @@
 (ns soipf.models.user
   (:require [noir.util.crypt :as crypt]
             [noir.session :as session]
-            [noir.validation :as vali])
+            [noir.validation :as vali]
+            [clj-time :as time])
   (:use [soipf.util :only [defquery]]
         [somnium.congomongo :only [fetch-one insert!]]))
 
@@ -13,7 +14,7 @@
       (insert! :users {:login login
                        :salt salt
                        :password-hash password-hash
-                       :created-at (java.util.Date.)}))))
+                       :created-at (time/now)}))))
 
 (defquery validate-user [login password]
   (if-let [{:keys [salt password-hash] :as user}

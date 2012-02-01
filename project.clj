@@ -3,5 +3,6 @@
             :dependencies [[org.clojure/clojure "1.3.0"]
                            [noir "1.2.2"]
                            [ring-anti-forgery "0.1.1"]
-                           [org.clojars.doo/congomongo "0.1.8-SNAPSHOT"]]
+                           [congomongo "0.1.7"]
+                           [clj-time "0.3.4"]]
             :main soipf.server)

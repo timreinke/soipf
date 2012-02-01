@@ -1,5 +1,7 @@
 (ns soipf.views.common
-  (:require [noir.validation :as vali])
+  (:require [noir.validation :as vali]
+            [clj-time [format :as format]
+                      [coerce :as coerce]])
   (:use [noir.core :only [defpartial]]
         [hiccup.page-helpers :only [include-css include-js html5 link-to]]))
 
@@ -11,6 +13,12 @@
 (defn error-help [field]
   (vali/on-error field (fn [es] (list [:br] [:span.help-inline (first es)]))))
 
+(def date-format (format/formatter "yyyy-MM-dd hh:mm"))
+
+(defn date-str [date]
+  (if (= (class date) org.joda.time.DateTime)
+    (format/unparse date-format date)
+    (date-str (coerce/from-date date))))
 
 (defpartial error-text [errors]
   [:div.alert (interpose [:br] errors)])

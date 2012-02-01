@@ -31,7 +31,7 @@
   [:tr
    [:td title]
    [:td author]
-   [:td (when created-at (.. (java.text.DateFormat/getDateInstance) (format created-at)))]
+   [:td (date-str created-at)]
    [:td reply-count]])
 
 (defpartial thread-listing [threads]

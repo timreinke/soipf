@@ -1,6 +1,7 @@
 (ns soipf.models.thread
   (:require [noir.validation :as vali]
-            [noir.session :as session])
+            [noir.session :as session]
+            [clj-time :as time])
   (:use [soipf.util :only [defquery]]
         somnium.congomongo))
 
@@ -17,7 +18,7 @@
 
 (defquery create-thread [title body]
   (when (valid? title body)
-    (let [now (java.util.Date.)
+    (let [now (time/now)
           login (session/get :login "Anonymous")]
       (insert! :threads {:title title :author login
                          :created-at now :updated-at now
