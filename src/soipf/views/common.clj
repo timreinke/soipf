@@ -25,11 +25,6 @@
 (defpartial error-text [errors]
   [:div.alert (interpose [:br] errors)])
 
-(defpartial navigation []
-  [:ul.nav.list
-   [:li.active [:a "Home"]]
-   [:li [:a "Tomorrow"]]])
-
 (defpartial user-bar []
   (if-let [login (user/logged-in?)]
     [:ul.nav.pull-right
@@ -57,7 +52,6 @@
                   (user-bar)]]]
                [:div.container
                 [:div.row
-                 [:div.span2 (navigation)]
-                 [:div.span10 content]]]
+                 [:div.span12 content]]]
                (include-js "http://code.jquery.com/jquery-1.7.1.js")
                (include-js "/js/bootstrap.js")]))
