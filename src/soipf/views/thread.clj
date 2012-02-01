@@ -58,10 +58,6 @@
 
 (defpage "/thread/new" {:as t}
   (layout [:div.row
-           [:div.span2
-            [:ul.nav.list
-             [:li.active [:a "Home"]]
-             [:li [:a "Tomorrow"]]]]
            [:div.span10 (new-thread t)]]))
 
 (defpage [:post "/thread/new"] {:keys [title body] :as t}
