@@ -1,10 +1,11 @@
 (ns soipf.views.user
-  (:require [soipf.views.common :as common]
-            [soipf.models.user :as user]
-            [clojure.string :as string])
+  (:require [soipf.models.user :as user]
+            [clojure.string :as string]
+            [noir.validation :as vali])
   (:use [noir.core :only [defpage defpartial render]]
         [noir.response :only [redirect]]
-        [hiccup.form-helpers]))
+        [hiccup.form-helpers]
+        [soipf.views.common]))
 
 (defpartial login-form [usr]
   (form-to {:class "well"} [:post "/login"]
@@ -21,7 +22,7 @@
 (defpage "/login" {:as usr}
   (if (user/logged-in?)
     (redirect "/")
-    (common/layout
+    (layout
      [:div.row
       [:div.span4.offset4 (login-form usr)]])))
 

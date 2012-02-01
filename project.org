@@ -18,8 +18,9 @@
 ** Login
 *** DONE Basic login page
     CLOSED: [2012-01-31 Tue 00:31]
-*** Login on page header
-*** Detour (instead of redirect to home)
+*** TODO Cookie based login
+*** TODO Login on page header
+*** TODO Detour (instead of redirect to home)
 ** Threads
 *** Create
 **** DONE Basic create
@@ -28,6 +29,7 @@
 *** Reply
 *** Display
 *** List
+**** Basic thread list
 **** Order by date
 **** Paginate
 ** Categories
@@ -39,3 +41,6 @@
 * Under the hood
 ** Use a better object id?
 *** MongoDB ids are long & ugly
+** TODO [#A] Convert to clj-time
+* Notes
+** Placeholder

@@ -1,6 +1,16 @@
 (ns soipf.views.common
+  (:require [noir.validation :as vali])
   (:use [noir.core :only [defpartial]]
         [hiccup.page-helpers :only [include-css include-js html5]]))
+
+(defn error-class [field]
+  (str "control-group"
+       (if (vali/errors? field)
+         " error")))
+
+(defn error-help [field]
+  (vali/on-error field (fn [es] (list [:br] [:span.help-inline (first es)]))))
+
 
 (defpartial error-text [errors]
   [:div.alert (interpose [:br] errors)])

@@ -1,19 +1,11 @@
 (ns soipf.views.thread
-  (:require [soipf.views.common :as common]
-            [noir.validation :as vali])
+  (:require [noir.validation :as vali])
   (:use [noir.core :only [defpage defpartial pre-route render]]
         [noir.response :only [redirect]]
         [hiccup.form-helpers]
+        [soipf.views.common]
         [soipf.models.thread :only [get-thread-listing create-thread]]
         [soipf.models.user :only [logged-in?]]))
-
-(defn error-class [field]
-  (str "control-group"
-       (if (vali/errors? field)
-         " error")))
-
-(defn error-help [field]
-  (vali/on-error field (fn [es] (list [:br] [:span.help-inline (first es)]))))
 
 (defpartial new-thread [{:keys [title body]}]
   (form-to {:class "form-horizontal"} [:post "/thread/new"]
@@ -35,25 +27,44 @@
            [:div.form-actions
             [:button.btn.primary {:type "submit"} "Create Thread"]]))
 
+(defpartial list-thread [{:keys [_id title author created-at updated-at reply-count]}]
+  [:tr
+   [:td title]
+   [:td author]
+   [:td (when created-at (.. (java.text.DateFormat/getDateInstance) (format created-at)))]
+   [:td reply-count]])
 
-(defpartial display-thread-listing [threads]
+(defpartial thread-listing [threads]
   (if (empty? threads)
-    [:div "There are no threads here!  You should make one"]))
+    [:div "There are no threads here!  You should make one"]
+    [:table.table.table-striped
+     [:thead
+      [:tr
+       [:th "Title"]
+       [:th "Author"]
+       [:th "Created"]
+       [:th "Replies"]]]
+     [:tbody
+      (for [t threads]
+        (list-thread t))]]))
 
 (defpage "/" []
-  (common/layout
-   (display-thread-listing (get-thread-listing))))
-
+  (layout
+   (thread-listing (get-thread-listing))))
 
 (pre-route "/thread/new" {}
-  (when-not (logged-in?)
-    (redirect "/login")))
+           (when-not (logged-in?)
+             (redirect "/login")))
 
 (defpage "/thread/new" {:as t}
-  (common/layout [:div.row
-                  [:div.span6.offset3 (new-thread t)]]))
+  (layout [:div.row
+           [:div.span2
+            [:ul.nav.list
+             [:li.active [:a "Home"]]
+             [:li [:a "Tomorrow"]]]]
+           [:div.span10 (new-thread t)]]))
 
 (defpage [:post "/thread/new"] {:keys [title body] :as t}
   (if (create-thread title body)
-    (common/layout "success!")
+    (layout "success!")
     (render "/thread/new" t)))
