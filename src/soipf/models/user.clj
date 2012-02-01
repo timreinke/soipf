@@ -2,7 +2,7 @@
   (:require [noir.util.crypt :as crypt]
             [noir.session :as session]
             [noir.validation :as vali]
-            [clj-time :as time])
+            [clj-time.core :as time])
   (:use [soipf.util :only [defquery]]
         [somnium.congomongo :only [fetch-one insert!]]))
 

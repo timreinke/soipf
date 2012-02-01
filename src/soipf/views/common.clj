@@ -31,8 +31,10 @@
    [:li [:a "Tomorrow"]]])
 
 (defpartial user-bar []
-  (if (user/logged-in?)
-    [:ul.nav.pull-right[:li (link-to "/logout" "Logout")]]
+  (if-let [login (user/logged-in?)]
+    [:ul.nav.pull-right
+     [:li [:a login]]
+     [:li (link-to "/logout" "logout")]]
     (list
      (form-to {:class "navbar-search pull-right"} [:post "/login"]
               (text-field {:class "input-small" :style "margin-right: 5px"
