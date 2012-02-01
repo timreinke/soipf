@@ -23,8 +23,7 @@
   (if (user/logged-in?)
     (redirect "/")
     (layout
-     [:div.row
-      [:div.span4.offset4 (login-form usr)]])))
+     (login-form usr))))
 
 (defpage [:post "/login"] {:keys [login password] :as usr}
   (if (user/login login password)

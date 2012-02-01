@@ -1,9 +1,11 @@
 (ns soipf.views.common
-  (:require [noir.validation :as vali]
+  (:require [soipf.models.user :as user]
+            [noir.validation :as vali]
             [clj-time [format :as format]
                       [coerce :as coerce]])
   (:use [noir.core :only [defpartial]]
-        [hiccup.page-helpers :only [include-css include-js html5 link-to]]))
+        [hiccup.page-helpers]
+        [hiccup.form-helpers]))
 
 (defn error-class [field]
   (str "control-group"
@@ -28,6 +30,17 @@
    [:li.active [:a "Home"]]
    [:li [:a "Tomorrow"]]])
 
+(defpartial user-bar []
+  (if (user/logged-in?)
+    [:ul.nav.pull-right[:li (link-to "/logout" "Logout")]]
+    (list
+     (form-to {:class "navbar-search pull-right"} [:post "/login"]
+              (text-field {:class "input-small" :style "margin-right: 5px"
+                           :placeholder "Username"} "login")
+              (password-field {:class "input-small" :style "margin-right: 5px"
+                               :placeholder "Password"} "password")
+              (submit-button {:style "position: absolute; left: -9999px; width: 1px; height: 1px"} "")))))
+
 (defpartial layout [& content]
             (html5
               [:head
@@ -38,7 +51,8 @@
                [:div.navbar
                 [:div.navbar-inner
                  [:div.container
-                  (link-to {:class "brand"} "#" "soipf")]]]
+                  (link-to {:class "brand"} "/" "soipf")
+                  (user-bar)]]]
                [:div.container
                 [:div.row
                  [:div.span2 (navigation)]

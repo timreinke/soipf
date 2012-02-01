@@ -3,6 +3,7 @@
   (:use [noir.core :only [defpage defpartial pre-route render]]
         [noir.response :only [redirect]]
         [hiccup.form-helpers]
+        [hiccup.page-helpers]
         [soipf.views.common]
         [soipf.models.thread :only [get-thread-listing create-thread]]
         [soipf.models.user :only [logged-in?]]))
@@ -50,6 +51,8 @@
 
 (defpage "/" []
   (layout
+   [:div.row
+    (link-to {:class "btn primary pull-right"} "/thread/new" "New Thread")]
    (thread-listing (get-thread-listing))))
 
 (pre-route "/thread/new" {}
@@ -57,8 +60,7 @@
              (redirect "/login")))
 
 (defpage "/thread/new" {:as t}
-  (layout [:div.row
-           [:div.span10 (new-thread t)]]))
+  (layout (new-thread t)))
 
 (defpage [:post "/thread/new"] {:keys [title body] :as t}
   (if (create-thread title body)
