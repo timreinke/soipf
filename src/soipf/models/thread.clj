@@ -3,7 +3,7 @@
             [noir.session :as session]
             [clj-time.core :as time]
             [clj-time.coerce :as coerce])
-  (:use [soipf.util :only [defquery]]
+  (:use soipf.db
         somnium.congomongo))
 
 (def thread-metadata
@@ -14,23 +14,31 @@
   (vali/rule (vali/has-value? body) [:body "You must have a body"])
   (not (vali/errors? :title :body)))
 
-(defquery get-thread-listing []
+(defn get-thread-listing []
   (fetch :threads :only thread-metadata :limit 20 :sort {:updated-at -1}))
 
-(defquery create-thread [title body]
+(defn create-thread [title body]
   (when (valid? title body)
     (let [now (java.util.Date.)
           login (session/get :login "Anonymous")]
-      (insert! :threads {:title title :author login
+      (insert! :threads {:_id (new-id "threads")
+                         :title title :author login
                          :created-at now :updated-at now
                          :reply-count 0
                          :posts [{:author login
                                   :created-at now
                                   :content body}]}))))
 
-(defquery retrieve-thread [id]
-  (try
-    (fetch-one :threads :where {:_id (object-id id)})
-    ;; this handles the case where the id passed in is not
-    ;; a valid mongodb objectid
-    (catch java.lang.IllegalArgumentException _)))
+(defn add-post [thread-id body]
+  (let [now (java.util.Date.)
+        login (session/get :login "Anonymous")]
+    (update! :threads {:_id thread-id}
+             {:$push {:posts {:author login
+                              :created-at now
+                              :content body}}})))
+
+(defn retrieve-thread
+  ([id]
+     (fetch-one :threads :where {:_id id}))
+  ([id slice]
+     (fetch-one :threads :where {:_id id})))

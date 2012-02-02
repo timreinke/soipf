@@ -52,10 +52,10 @@
 (defpage "/" []
   (layout
    [:div.row
-    (link-to {:class "btn primary pull-right"} "/thread" "New Thread")]
+    (link-to {:class "btn btn-primary pull-right"} "/thread" "New Thread")]
    (thread-listing (get-thread-listing))))
 
-(pre-route "/thread" {}
+(pre-route "/thread*" {}
            (when-not (logged-in?)
              (redirect "/login")))
 
@@ -67,7 +67,24 @@
     (redirect (url-for show-thread {:id (:_id thread)}))
     (render "/thread" t)))
 
-(defpage show-thread "/thread/:id" {:keys [id]}
+(defpartial thread-heading [title]
+  [:h1.thread title])
+
+(defpartial display-post [{:keys [author created-at content]}]
+  [:div.post.well
+   [:div.heading [:span.author author] " at " (date-str created-at)]
+   [:hr]
+   [:div.content content]])
+
+(defpage show-thread [:get "/thread/:id"] {:keys [id]}
   (if-let [{:keys [_id title author created-at posts] :as thread} (retrieve-thread id)]
-    (layout )
+    (layout (thread-heading title)
+            [:div.posts
+             (for [p posts]
+               (display-post p))]
+            [:div "Reply"])
     (status 404 (layout "Thread not found"))))
+
+;; (defpage post-to-thread [:post "/thread/:id"]
+;;   (if-let [{:keys [_id title posts]} (retrieve-thread id -5)]
+;;     ))
