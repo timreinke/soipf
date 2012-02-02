@@ -26,7 +26,7 @@
               body]
              (error-help :body)]]
            [:div.form-actions
-            [:button.btn.primary {:type "submit"} "Create Thread"]]))
+            [:button.btn.btn-primary {:type "submit"} "Create Thread"]]))
 
 (defpartial list-thread [{:keys [_id title author created-at updated-at reply-count]}]
   [:tr
