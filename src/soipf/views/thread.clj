@@ -2,10 +2,10 @@
   (:require [noir.validation :as vali])
   (:use noir.core
         [noir.response :only [redirect status json]]
-        [hiccup.form-helpers]
-        [hiccup.page-helpers]
-        [soipf.views.common]
-        [soipf.models.thread :only [get-thread-listing create-thread retrieve-thread]]
+        hiccup.form-helpers
+        hiccup.page-helpers
+        soipf.views.common
+        [soipf.models.thread :only [create-thread! add-reply! get-thread-listing retrieve-thread]]
         [soipf.models.user :only [logged-in?]]))
 
 (defpartial new-thread [{:keys [title body]}]
@@ -65,7 +65,7 @@
   (layout (new-thread t)))
 
 (defpage [:post "/thread"] {:keys [title body] :as t}
-  (if-let [thread (create-thread title body)]
+  (if-let [thread (create-thread! (assoc t :author (logged-in?)))]
     (redirect (url-for show-thread {:id (:_id thread)}))
     (render "/thread" t)))
 
@@ -78,15 +78,36 @@
    [:hr]
    [:div.content content]])
 
-(defpage show-thread [:get "/thread/:id"] {:keys [id]}
-  (if-let [{:keys [_id title author created-at posts] :as thread} (retrieve-thread id)]
-    (layout (thread-heading title)
-            [:div.posts
-             (for [p posts]
-               (display-post p))]
-            [:div "Reply"])
-    (status 404 (layout "Thread not found"))))
+(declare reply-to-thread)
 
-;; (defpage post-to-thread [:post "/thread/:id"]
-;;   (if-let [{:keys [_id title posts]} (retrieve-thread id -5)]
-;;     ))
+(defpartial reply-form [id body]
+  (form-to {:class "form-horizontal well"} [:post (url-for reply-to-thread {:id id})]
+           [:legend "Add Reply"]
+           [:div {:class (error-class :body)}
+            [:label {:for "body"} "Body"]
+            ;; TODO: create this style
+            [:div.controls
+             [:textarea#body.input-xlarge
+              {:name "body" :rows 6 }
+              body]
+             (error-help :body)]]
+           [:div.form-actions
+            [:button.btn.btn-primary {:type "submit"} "Add Reply"]]))
+
+(defpartial display-thread [{:keys [title posts]}]
+  (thread-heading title)
+  [:div.posts
+   (for [p posts]
+     (display-post p))])
+
+(defpage show-thread [:get "/thread/:id"] {:keys [id body]}
+  (if-let [{:keys [_id title author created-at posts] :as thread} (retrieve-thread id)]
+    (layout (display-thread thread)
+            (reply-form id body))
+    (status 404 (layout [:h1 "Thread not found"]))))
+
+(defpage reply-to-thread [:post "/thread/:id"] {:keys [id body] :as args}
+  (if-let [{:keys [_id title posts]} (retrieve-thread id -5)]
+    (do (add-reply! (assoc args :author (logged-in?)))
+        (render show-thread {:id id}))
+    (redirect "/")))
