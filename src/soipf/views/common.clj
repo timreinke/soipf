@@ -42,8 +42,7 @@
             (html5
               [:head
                [:title "soipf"]
-               (include-css "/css/bootstrap.css")
-               (include-css "/css/bootstrap.responsive.css")]
+               (include-css "/css/app.css")]
               [:body
                [:div.navbar
                 [:div.navbar-inner
