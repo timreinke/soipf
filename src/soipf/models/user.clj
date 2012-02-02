@@ -24,11 +24,11 @@
 
 (defn login [login password]
   (if-let [user (validate-user login password)]
-    (session/put! :login (:login user))
+    (session/put! :user user)
     (vali/set-error :login "Invalid username or password")))
 
 (defn logout []
-  (session/remove! :login))
+  (session/remove! :user))
 
 (defn logged-in? []
-  (session/get :login))
+  (session/get :user))

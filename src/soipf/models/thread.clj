@@ -17,25 +17,26 @@
 (defn get-thread-listing []
   (fetch :threads :only thread-metadata :limit 20 :sort {:updated-at -1}))
 
-(defn create-thread [title body]
+(defn create-thread! [{:keys [title body author]}]
   (when (valid? title body)
-    (let [now (java.util.Date.)
-          login (session/get :login "Anonymous")]
+    (let [now (java.util.Date.)]
       (insert! :threads {:_id (new-id "threads")
-                         :title title :author login
+                         :title title :author author
                          :created-at now :updated-at now
                          :reply-count 0
-                         :posts [{:author login
+                         :posts [{:author author
                                   :created-at now
                                   :content body}]}))))
 
-(defn add-post [thread-id body]
+(defn add-reply! [{:keys [id body author]}]
   (let [now (java.util.Date.)
         login (session/get :login "Anonymous")]
-    (update! :threads {:_id thread-id}
-             {:$push {:posts {:author login
+    (update! :threads {:_id id}
+             {:$push {:posts {:author author
                               :created-at now
-                              :content body}}})))
+                              :content body}}
+              :$set {:created-at now}
+              :$inc {:reply-count 1}})))
 
 (defn retrieve-thread
   ([id]

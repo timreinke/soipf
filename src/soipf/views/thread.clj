@@ -28,10 +28,12 @@
            [:div.form-actions
             [:button.btn.btn-primary {:type "submit"} "Create Thread"]]))
 
+(declare show-thread)
+
 (defpartial list-thread [{:keys [_id title author created-at updated-at reply-count]}]
   [:tr
    [:td (link-to (url-for show-thread {:id _id}) title)]
-   [:td author]
+   [:td (:login author)]
    [:td (date-str created-at)]
    [:td reply-count]])
 
@@ -72,7 +74,7 @@
 
 (defpartial display-post [{:keys [author created-at content]}]
   [:div.post.well
-   [:div.heading [:span.author author] " at " (date-str created-at)]
+   [:div.heading [:span.author (:login author)] " at " (date-str created-at)]
    [:hr]
    [:div.content content]])
 
