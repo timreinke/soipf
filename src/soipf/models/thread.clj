@@ -4,6 +4,7 @@
             [clj-time.core :as time]
             [clj-time.coerce :as coerce])
   (:use soipf.db
+        soipf.format
         somnium.congomongo))
 
 (def thread-metadata
@@ -26,7 +27,8 @@
                          :reply-count 0
                          :posts [{:author author
                                   :created-at now
-                                  :content body}]}))))
+                                  :content (markdownify body)
+                                  :raw-content body}]}))))
 
 (defn add-reply! [{:keys [id body author]}]
   (let [now (java.util.Date.)
@@ -34,8 +36,9 @@
     (update! :threads {:_id id}
              {:$push {:posts {:author author
                               :created-at now
-                              :content body}}
-              :$set {:created-at now}
+                              :content (markdownify body)
+                              :raw-content body}}
+              :$set {:updated-at now}
               :$inc {:reply-count 1}})))
 
 (defn retrieve-thread

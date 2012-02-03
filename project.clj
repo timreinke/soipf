@@ -4,5 +4,6 @@
                            [noir "1.2.2"]
                            [ring-anti-forgery "0.1.1"]
                            [congomongo "0.1.7"]
-                           [clj-time "0.3.4"]]
+                           [clj-time "0.3.4"]
+                           [org.pegdown/pegdown "1.1.0"]]
             :main soipf.server)
