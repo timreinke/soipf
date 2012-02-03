@@ -3,10 +3,9 @@
             [noir.session :as session]
             [noir.validation :as vali]
             [clj-time.core :as time])
-  (:use [soipf.util :only [defquery]]
-        [somnium.congomongo :only [fetch-one insert!]]))
+  (:use [somnium.congomongo :only [fetch-one insert!]]))
 
-(defquery create-user [login password]
+(defn create-user [login password]
   (if (fetch-one :users :where {:login login})
     (vali/set-error :login "Username already exists")
     (let [salt (crypt/gen-salt)
@@ -16,7 +15,7 @@
                        :password-hash password-hash
                        :created-at (time/now)}))))
 
-(defquery validate-user [login password]
+(defn validate-user [login password]
   (if-let [{:keys [salt password-hash] :as user}
              (fetch-one :users :where {:login login})]
     (if (= password-hash (crypt/encrypt salt password))
