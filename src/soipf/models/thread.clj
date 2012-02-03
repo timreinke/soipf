@@ -5,7 +5,8 @@
             [clj-time.coerce :as coerce])
   (:use soipf.db
         soipf.format
-        somnium.congomongo))
+        somnium.congomongo
+        [hiccup.core :only [escape-html]]))
 
 (def thread-metadata
   [:title :author :created-at :updated-at :reply-count])
@@ -22,7 +23,7 @@
   (when (valid? title body)
     (let [now (java.util.Date.)]
       (insert! :threads {:_id (new-id "threads")
-                         :title title :author author
+                         :title (escape-html title) :author author
                          :created-at now :updated-at now
                          :reply-count 0
                          :posts [{:author author
