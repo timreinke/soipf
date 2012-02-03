@@ -19,7 +19,6 @@
 
            [:div {:class (error-class :body)}
             [:label {:for "body"} "Body"]
-            ;; TODO: create this style
             [:div.controls
              [:textarea#body.input-xlarge
               {:name "body" :rows 6 }
@@ -27,8 +26,6 @@
              (error-help :body)]]
            [:div.form-actions
             [:button.btn.btn-primary {:type "submit"} "Create Thread"]]))
-
-(declare show-thread)
 
 (defpartial list-thread [{:keys [_id title author created-at updated-at reply-count]}]
   [:tr
@@ -78,14 +75,11 @@
    [:hr]
    [:div.content content]])
 
-(declare reply-to-thread)
-
 (defpartial reply-form [id body]
   (form-to {:class "form-horizontal well"} [:post (url-for reply-to-thread {:id id})]
            [:legend "Add Reply"]
            [:div {:class (error-class :body)}
             [:label {:for "body"} "Body"]
-            ;; TODO: create this style
             [:div.controls
              [:textarea#body.input-xlarge
               {:name "body" :rows 6 }
