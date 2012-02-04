@@ -26,9 +26,9 @@
   [:div.alert (interpose [:br] errors)])
 
 (defpartial user-bar []
-  (if-let [login (user/logged-in?)]
+  (if-let [user (user/logged-in?)]
     [:ul.nav.pull-right
-     [:li [:a login]]
+     [:li [:a (:login user)]]
      [:li (link-to "/logout" "logout")]]
     (list
      (form-to {:class "navbar-search pull-right"} [:post "/login"]
