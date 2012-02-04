@@ -17,7 +17,7 @@
 
 (defn validate-user [login password]
   (if-let [{:keys [salt password-hash] :as user}
-             (fetch-one :users :where {:login login})]
+           (fetch-one :users :where {:login login})]
     (if (= password-hash (crypt/encrypt salt password))
       user)))
 
