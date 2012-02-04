@@ -12,7 +12,10 @@
 
 (def date-format (format/formatter "yyyy-MM-dd hh:mm"))
 
-(defn date-str [date]
-  (if (= (class date) org.joda.time.DateTime)
-    (format/unparse date-format date)
-    (date-str (coerce/from-date date))))
+(def cookie-format (format/formatter "E, dd-MMM-yyyy HH:mm:ss z"))
+
+(defn date-str [date & [format]]
+  (let [format (or format date-format)]
+    (if (= (class date) org.joda.time.DateTime)
+      (format/unparse format date)
+      (date-str (coerce/from-date date) format))))
