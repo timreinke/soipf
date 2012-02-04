@@ -5,6 +5,7 @@
         hiccup.form-helpers
         hiccup.page-helpers
         soipf.views.common
+        [soipf.format :only [date-str]]
         [soipf.models.thread :only [create-thread! add-reply! get-thread-listing retrieve-thread]]
         [soipf.models.user :only [logged-in?]]))
 
