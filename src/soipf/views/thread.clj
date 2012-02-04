@@ -51,7 +51,7 @@
 (defpage "/" []
   (layout
    [:div.row
-    (link-to {:class "btn btn-primary pull-right"} "/thread" "New Thread")]
+    (link-to {:class "btn btn-primary"} "/thread" "New Thread")]
    (thread-listing (get-thread-listing))))
 
 (pre-route "/thread*" {}
