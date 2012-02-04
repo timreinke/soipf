@@ -38,9 +38,3 @@
                                {:login "tim" :password "wrong"})]
         (has-status resp 200)
         (is (.contains (:body resp) "Invalid username or password"))))))
-
-
-(deftest cookie-test
-  (with-noir
-    (let [resp (send-request "/test")]
-      (println resp))))
