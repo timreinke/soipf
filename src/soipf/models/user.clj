@@ -5,15 +5,22 @@
             [clj-time.core :as time])
   (:use somnium.congomongo))
 
-(defn create-user! [login password]
+(defn valid? [login password password-confirm]
   (if (fetch-one :users :where {:login login})
-    (vali/set-error :login "Username already exists")
-    (let [salt (crypt/gen-salt)
-          password-hash (crypt/encrypt salt password)]
-      (insert! :users {:login login
-                       :salt salt
-                       :password-hash password-hash
-                       :created-at (java.util.Date.)}))))
+    (vali/set-error :login "Login already exists"))
+  (if (not (= password password-confirm))
+    (vali/set-error :password "Passwords don't match"))
+  (if (vali/errors?)
+    false
+    true))
+
+(defn create-user! [login password]
+  (let [salt (crypt/gen-salt)
+        password-hash (crypt/encrypt salt password)]
+    (insert! :users {:login login
+                     :salt salt
+                     :password-hash password-hash
+                     :created-at (java.util.Date.)})))
 
 (defn validate-user [login password]
   (if-let [{:keys [salt password-hash] :as user}

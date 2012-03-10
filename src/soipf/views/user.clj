@@ -1,10 +1,12 @@
 (ns soipf.views.user
   (:require [soipf.models.user :as user]
+            [soipf.api.invitation :as invitation]
             [clojure.string :as string]
             [noir.validation :as vali]
             [noir.cookies :as cookies]
+            [noir.session :as session]
             [clj-time.core :as time])
-  (:use [noir.core :only [defpage defpartial render]]
+  (:use noir.core
         [noir.response :only [redirect]]
         hiccup.form-helpers
         soipf.views.common
@@ -22,6 +24,20 @@
              (password-field {:placeholder "Password"} :password)]]
            (hidden-field "persistent" "true")
            (submit-button "Login")))
+
+(defpartial registration-form [registration]
+  (form-to {:class "well"} [:post (url-for register registration)]
+           [:legend "Register"]
+           [:div {:class (error-class :login)}
+            [:div.controls
+             (text-field {:placeholder "Username"} :login (:login registration))]]
+           [:div {:class (error-class :password)}
+            [:div.controls
+             (password-field {:placeholder "Password"} :password)]]
+           [:div.control-group
+            [:div.controls
+             (password-field {:placeholder "Confirm Passowrd"} :password-confirm)]]
+           (submit-button "Register")))
 
 (defpage "/login" {:as usr}
   (if (user/logged-in?)
@@ -45,7 +61,18 @@
   (user/logout)
   (redirect "/"))
 
-(defpage "/test" {}
-  (cookies/put! :test-cookie
-                {:value "test"})
-  (redirect "/"))
+(defpage register "/register/:invite-id" {:as registration}
+  (layout
+   (if (invitation/valid? (:invite-id registration))
+     (registration-form registration)
+     [:h1 "Invitation not found"])))
+
+(defpage do-registration [:post "/register/:invite-id"]
+      {:keys [login password password-confirm invite-id] :as registration}
+  (if (and (user/valid? login password password-confirm)
+           (invitation/valid? invite-id))
+    (let [user (user/create-user! login password)]
+      (invitation/use! invite-id user)
+      (session/put! :user user)
+      (redirect "/"))
+    (render register registration)))
