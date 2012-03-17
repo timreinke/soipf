@@ -12,20 +12,21 @@
 (defn generate-invitation-code []
   (sha1 (str (java.util.Date.) (rand))))
 
-(defn valid? [id]
-  (not (get (retrieve id) :by)))
-
-(defn create! [user]
-  (insert! :invitations
-           {:_id (new-id "invitations")
-            :code (generate-invitation-code)
-            :created-at (java.util.Date.)
-            :from user}))
 
 (defn retrieve [id]
   (fetch-one :invitations :where {:_id id}))
 
+(defn create! [user]
+  (insert! :invitations
+           {:_id (generate-invitation-code)
+            :created-at (java.util.Date.)
+            :from user}))
+
 (defn use! [id new-user]
   (update! :invitations {:_id id}
            {:$set {:used-at (java.util.Date.)
-                   :by new-user}}))
+                   :to new-user}}))
+
+(defn valid? [id]
+  (let [invite (retrieve id)]
+    (and invite (not (:to invite)))))
