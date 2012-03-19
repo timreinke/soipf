@@ -1,0 +1,141 @@
+body,html {
+    height: 100%;
+}
+
+body { 
+    background-color: #EEE;
+}
+
+a {
+    text-decoration: none;
+}
+
+#wrapper {
+    width: 100%;
+    height: 100%;
+    padding: 0px;
+    margin: 0px;
+    font-family: Arial;
+    font-size: 12pt;
+    overflow: visible;
+}
+
+#slash {
+    position: absolute;
+    left: 150px;
+}
+
+#navcolumn {
+    width: 150px;
+    float: left;
+}
+
+#navheader {
+    text-align: center;
+    font-size: 2em;
+    font-family: Verdana;
+    color: #000;    
+}
+
+#navbody .items .category {
+    border-bottom: 1px #CCC solid;
+    border-top: 1px #CCC solid;
+    padding: 2px;
+    margin-top: -1px;
+    color: #111;
+}
+
+#navbody .items .active {
+    background-color: #fff;
+}
+
+#navbody a {
+    color: #111;
+}
+
+#navbody .active a{
+    color: #d2d;
+}
+
+#contentbody {
+    background-color: #fff;
+    overflow: hidden;
+    min-height: 500px;
+}
+
+#contentheader {
+    font-size: 2em;
+    background-color: #d2d;
+    color: #fff;
+    padding-left: 10px;
+}
+
+.topics {
+    margin: 10px;
+    background-color: #eee;
+    width: 550px;
+}
+
+.loginbox {
+    width: 400px;
+    margin: auto;
+    position: relative
+}
+
+.boxheader {
+    font-size: 1.5em;
+    padding: 2px 2px 2px 6px;
+    background-color: #d2d;
+    color: #fff;
+}
+
+.boxbody {
+    background-color: #fff;
+    color: #000;
+    overflow:hidden;
+}
+
+.topicnew {
+    float:right;
+    padding-right:10px;
+}
+
+.topicnew a {
+    color: #fff;
+}
+
+ul.topics {
+    list-style-type: none;
+    margin: 0px;
+    padding-left: 10px;
+    padding-top: 5px;
+    width: auto;
+}
+
+ul.topics a {
+    color: #111;
+}
+
+.button {
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: 1em;
+    font-family: Arial;
+    cursor: pointer;
+
+}
+
+#labels {
+    float:left;
+}
+#fields {
+    float:left;
+}
+
+/*
+  #a6c
+  #a8d
+  #d2d
+  #ff0
+*/

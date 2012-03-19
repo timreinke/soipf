@@ -16,6 +16,12 @@
 (defpartial error-text [errors]
   [:div.alert (interpose [:br] errors)])
 
+(defpartial head [title]
+   [:head
+    [:title "soipf/" title]
+    (include-css "/css/reset.css"
+                 "/css/main.css")])
+
 (defpartial user-bar []
   (if-let [user (user/logged-in?)]
     [:ul.nav.pull-right
@@ -31,17 +37,12 @@
 
 (defpartial layout [& content]
             (html5
-              [:head
-               [:title "soipf"]
-               (include-css "/css/app.css")]
-              [:body
-               [:div.navbar
-                [:div.navbar-inner
-                 [:div.container
-                  (link-to {:class "brand"} "/" "soipf")
-                  (user-bar)]]]
-               [:div.container
-                [:div.row
-                 [:div.span12 content]]]
-               (include-js "http://code.jquery.com/jquery-1.7.1.js")
-               (include-js "/js/bootstrap.js")]))
+             (head "soipf")
+             [:body
+              [:div#top
+               (link-to {:class "brand"} "/" "soipf")
+               (user-bar)]
+              [:div#wrapper
+               [:div#content
+                content]]
+              (include-js "http://code.jquery.com/jquery-1.7.1.js")]))
