@@ -2,13 +2,40 @@ body,html {
     height: 100%;
 }
 
-body { 
+body {
     background-color: #EEE;
 }
 
 a {
     text-decoration: none;
 }
+
+
+.pull-right {
+    float:right;
+}
+
+.top {
+    background-color: #d2d;
+    color: #EEE;
+    padding: 2px;
+    margin: 0px;
+    font-size: 1.2em;
+    font-family: Courier;
+}
+
+.top .title {
+    color: #fff;
+}
+
+.top a {
+    color: #fff;
+}
+
+.top input {
+    margin-right: 5px;
+}
+
 
 #wrapper {
     width: 100%;
@@ -34,7 +61,7 @@ a {
     text-align: center;
     font-size: 2em;
     font-family: Verdana;
-    color: #000;    
+    color: #000;
 }
 
 #navbody .items .category {

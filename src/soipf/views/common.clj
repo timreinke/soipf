@@ -22,16 +22,22 @@
     (include-css "/css/reset.css"
                  "/css/main.css")])
 
+(defpartial page-header []
+  [:div.top
+   (link-to {:class :title} "/" "soipf")
+   (user-bar)])
+
 (defpartial user-bar []
   (if-let [user (user/logged-in?)]
-    [:ul.nav.pull-right
-     [:li [:a (:login user)]]
-     [:li (link-to "/logout" "logout")]]
+    [:span.pull-right
+     [:a (:login user)]
+     "/"
+     (link-to "/logout" "logout")]
     (list
      (form-to {:class "navbar-search pull-right"} [:post "/login"]
-              (text-field {:class "input-small" :style "margin-right: 5px"
+              (text-field {:class "input-small"
                            :placeholder "Username"} "login")
-              (password-field {:class "input-small" :style "margin-right: 5px"
+              (password-field {:class "input-small"
                                :placeholder "Password"} "password")
               (submit-button {:style "position: absolute; left: -9999px; width: 1px; height: 1px"} "")))))
 
@@ -39,9 +45,7 @@
             (html5
              (head "soipf")
              [:body
-              [:div#top
-               (link-to {:class "brand"} "/" "soipf")
-               (user-bar)]
+              (page-header)
               [:div#wrapper
                [:div#content
                 content]]
