@@ -17,19 +17,16 @@ a {
 
 .top {
     background-color: #d2d;
-    color: #EEE;
+    color: #eee;
     padding: 2px;
     margin: 0px;
     font-size: 1.2em;
     font-family: Courier;
-}
-
-.top .title {
-    color: #fff;
+    font-weight: bold;
 }
 
 .top a {
-    color: #fff;
+    color: #eee;
 }
 
 .top input {
@@ -47,60 +44,21 @@ a {
     overflow: visible;
 }
 
-#slash {
-    position: absolute;
-    left: 150px;
-}
 
-#navcolumn {
-    width: 150px;
-    float: left;
-}
-
-#navheader {
-    text-align: center;
-    font-size: 2em;
-    font-family: Verdana;
-    color: #000;
-}
-
-#navbody .items .category {
-    border-bottom: 1px #CCC solid;
-    border-top: 1px #CCC solid;
-    padding: 2px;
-    margin-top: -1px;
-    color: #111;
-}
-
-#navbody .items .active {
-    background-color: #fff;
-}
-
-#navbody a {
-    color: #111;
-}
-
-#navbody .active a{
-    color: #d2d;
-}
-
-#contentbody {
-    background-color: #fff;
-    overflow: hidden;
-    min-height: 500px;
-}
-
-#contentheader {
-    font-size: 2em;
-    background-color: #d2d;
-    color: #fff;
-    padding-left: 10px;
-}
-
-.topics {
+.thread {
     margin: 10px;
-    background-color: #eee;
-    width: 550px;
+    background-color: #fff;
+}
+
+.thread .heading {
+    background-color: #d2d;
+    margin: 0px;
+    padding: 5px;
+    font-weight: bold;
+}
+
+.thread .heading a {
+    color: #eee;
 }
 
 .loginbox {
@@ -153,12 +111,21 @@ ul.topics a {
 
 }
 
-#labels {
-    float:left;
+.post p {
+    margin-bottom: 1em;
 }
-#fields {
-    float:left;
+
+.metadata {
+    color: #bbb;
 }
+
+.metadata .author {
+    color: #d2d;
+    font-weight: bold;
+    font-family: Courier;
+}
+
+
 
 /*
   #a6c

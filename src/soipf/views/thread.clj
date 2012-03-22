@@ -28,32 +28,31 @@
            [:div.form-actions
             [:button.btn.btn-primary {:type "submit"} "Create Thread"]]))
 
-(defpartial list-thread [{:keys [_id title author created-at updated-at reply-count]}]
-  [:tr
-   [:td (link-to (url-for show-thread {:id _id}) title)]
-   [:td (:login author)]
-   [:td (date-str created-at)]
-   [:td reply-count]])
+(defpartial display-post [post]
+  [:div.post
+   [:div.metadata
+    [:span.author (get-in post [:author :login])]
+    " at "
+    (date-str (post :created-at))]
+   (post :content)])
 
-(defpartial thread-listing [threads]
-  (if (empty? threads)
-    [:div "There are no threads here!  You should make one"]
-    [:table.table.table-striped
-     [:thead
-      [:tr
-       [:th "Title"]
-       [:th "Author"]
-       [:th "Created"]
-       [:th "Replies"]]]
-     [:tbody
-      (for [t threads]
-        (list-thread t))]]))
+(defpartial display-thread [thread]
+  [:div.thread
+   [:div.heading
+    (link-to (url-for show-thread {:id (thread :_id)}) (thread :title))]
+   [:div.content
+    (map display-post (thread :posts))]])
 
 (defpage "/" []
-  (layout
-   [:div.row
-    (link-to {:class "btn btn-primary"} "/thread" "New Thread")]
-   (thread-listing (get-thread-listing))))
+  (let [threads (get-thread-listing)
+        threads (map (fn [thread]
+                       (assoc thread :posts
+                              (take-last 4 (thread :posts))))
+                     threads)]
+    (layout
+     [:div.row
+      (link-to {:class "btn btn-primary"} "/thread" "New Thread")]
+     (map display-thread threads))))
 
 (pre-route "/thread*" {}
            (when-not (logged-in?)
@@ -67,15 +66,6 @@
     (redirect (url-for show-thread {:id (:_id thread)}))
     (render "/thread" t)))
 
-(defpartial thread-heading [title]
-  [:h1.thread title])
-
-(defpartial display-post [{:keys [author created-at content]}]
-  [:div.post.well
-   [:div.heading [:span.author (:login author)] " at " (date-str created-at)]
-   [:hr]
-   [:div.content content]])
-
 (defpartial reply-form [id body]
   (form-to {:class "form-horizontal well"} [:post (url-for reply-to-thread {:id id})]
            [:legend "Add Reply"]
@@ -88,12 +78,6 @@
              (error-help :body)]]
            [:div.form-actions
             [:button.btn.btn-primary {:type "submit"} "Add Reply"]]))
-
-(defpartial display-thread [{:keys [title posts]}]
-  (thread-heading title)
-  [:div.posts
-   (for [p posts]
-     (display-post p))])
 
 (defpage show-thread [:get "/thread/:id"] {:keys [id body]}
   (if-let [{:keys [_id title author created-at posts] :as thread} (retrieve-thread id)]

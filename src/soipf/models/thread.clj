@@ -17,7 +17,7 @@
   (not (vali/errors? :title :body)))
 
 (defn get-thread-listing []
-  (fetch :threads :only thread-metadata :limit 20 :sort {:updated-at -1}))
+  (fetch :threads :limit 20 :sort {:updated-at -1}))
 
 (defn create-thread! [{:keys [title body author]}]
   (when (valid? title body)
