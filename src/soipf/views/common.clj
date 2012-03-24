@@ -49,4 +49,4 @@
               [:div#wrapper
                [:div#content
                 content]]
-              (include-js "http://code.jquery.com/jquery-1.7.1.js")]))
+              (include-js "/js/jquery.js")]))
