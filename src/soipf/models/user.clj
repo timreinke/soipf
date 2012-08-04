@@ -3,7 +3,8 @@
             [noir.session :as session]
             [noir.validation :as vali]
             [clj-time.core :as time])
-  (:use somnium.congomongo))
+  (:use [soipf.db :only [new-id]]
+        somnium.congomongo))
 
 (defn valid? [login password password-confirm]
   (if (fetch-one :users :where {:login login})
@@ -17,19 +18,20 @@
 (defn create-user! [login password]
   (let [salt (crypt/gen-salt)
         password-hash (crypt/encrypt salt password)]
-    (insert! :users {:login login
+    (insert! :users {:_id (new-id "users")
+                     :login login
                      :salt salt
                      :password-hash password-hash
                      :created-at (java.util.Date.)})))
 
-(defn validate-user [login password]
-  (if-let [{:keys [salt password-hash] :as user}
+(defn authenticate-user [login password]
+  (when-let [{:keys [salt password-hash] :as user}
            (fetch-one :users :where {:login login})]
-    (if (= password-hash (crypt/encrypt salt password))
+    (when (= password-hash (crypt/encrypt salt password))
       user)))
 
 (defn login [login password]
-  (if-let [user (validate-user login password)]
+  (if-let [user (authenticate-user login password)]
     (session/put! :user user)
     (vali/set-error :login "Invalid username or password")))
 
