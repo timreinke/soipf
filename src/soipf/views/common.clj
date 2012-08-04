@@ -22,10 +22,6 @@
     (include-css "/css/reset.css"
                  "/css/main.css")])
 
-(defpartial page-header []
-  [:div.top
-   (link-to {:class :title} "/" "soipf")
-   (user-bar)])
 
 (defpartial user-bar []
   (if-let [user (user/logged-in?)]
@@ -41,6 +37,11 @@
                                :placeholder "Password"} "password")
               (submit-button {:style "position: absolute; left: -9999px; width: 1px; height: 1px"} "")))))
 
+(defpartial page-header []
+  [:div.top
+   (link-to {:class :title} "/" "soipf")
+   (user-bar)])
+
 (defpartial layout [& content]
             (html5
              (head "soipf")
@@ -49,4 +50,6 @@
               [:div#wrapper
                [:div#content
                 content]]
-              (include-js "/js/jquery.js")]))
+              (map include-js
+                   ["/js/jquery.js"
+                    "/js/app.js"])]))

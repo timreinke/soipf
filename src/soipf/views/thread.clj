@@ -1,6 +1,9 @@
 (ns soipf.views.thread
+  (:refer-clojure :exclude [get swap!])
   (:require [noir.validation :as vali])
   (:use noir.core
+        noir.request
+        noir.session
         [noir.response :only [redirect status json]]
         hiccup.form-helpers
         hiccup.page-helpers
@@ -26,7 +29,7 @@
               body]
              (error-help :body)]]
            [:div.form-actions
-            [:button.btn.btn-primary {:type "submit"} "Create Thread"]]))
+            [:button.click-once {:type "submit"} "Create Thread"]]))
 
 (defpartial display-post [post]
   [:div.post
@@ -36,26 +39,21 @@
     (date-str (post :created-at))]
    (post :content)])
 
-(defpartial display-thread [thread]
-  [:div.thread
-   [:div.heading
-    (link-to (url-for show-thread {:id (thread :_id)}) (thread :title))]
-   [:div.content
-    (map display-post (thread :posts))]])
+(defpartial list-thread [thread]
+  [:div.item (link-to (url-for show-thread {:id (thread :_id)})
+                      (thread :title))
+   [:div.info "by " (get-in thread [:author :login])]])
 
 (defpage "/" []
-  (let [threads (get-thread-listing)
-        threads (map (fn [thread]
-                       (assoc thread :posts
-                              (take-last 4 (thread :posts))))
-                     threads)]
+  (let [threads (get-thread-listing)]
     (layout
      [:div.row
       (link-to {:class "btn btn-primary"} "/thread" "New Thread")]
-     (map display-thread threads))))
+     (map list-thread threads))))
 
 (pre-route "/thread*" {}
            (when-not (logged-in?)
+             (put! :redirected-from ((ring-request) :uri))
              (redirect "/login")))
 
 (defpage "/thread" {:as t}
@@ -68,21 +66,26 @@
 
 (defpartial reply-form [id body]
   (form-to {:class "form-horizontal well"} [:post (url-for reply-to-thread {:id id})]
-           [:legend "Add Reply"]
            [:div {:class (error-class :body)}
-            [:label {:for "body"} "Body"]
             [:div.controls
              [:textarea#body.input-xlarge
-              {:name "body" :rows 6 }
+              {:name "body" :rows 6 :cols 50}
               body]
              (error-help :body)]]
            [:div.form-actions
-            [:button.btn.btn-primary {:type "submit"} "Add Reply"]]))
+            [:button.click-once {:type "submit"} "Add Reply"]]))
 
-(defpage show-thread [:get "/thread/:id"] {:keys [id body]}
+(defpartial display-thread [thread]
+  [:div.thread
+   [:div.heading
+    (link-to (url-for show-thread {:id (thread :_id)}) (thread :title))]
+   [:div.content
+    (map display-post (thread :posts))]
+   (reply-form (thread :_id) "")])
+
+(defpage show-thread "/thread/:id" {:keys [id body]}
   (if-let [{:keys [_id title author created-at posts] :as thread} (retrieve-thread id)]
-    (layout (display-thread thread)
-            (reply-form id body))
+    (layout (display-thread thread))
     (status 404 (layout [:h1 "Thread not found"]))))
 
 (defpage reply-to-thread [:post "/thread/:id"] {:keys [id body] :as args}

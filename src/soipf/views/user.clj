@@ -1,4 +1,5 @@
 (ns soipf.views.user
+  (:refer-clojure :exclude [get swap!])
   (:require [soipf.models.user :as user]
             [soipf.api.invitation :as invitation]
             [clojure.string :as string]
@@ -7,6 +8,7 @@
             [noir.session :as session]
             [clj-time.core :as time])
   (:use noir.core
+        noir.session
         [noir.response :only [redirect]]
         hiccup.form-helpers
         soipf.views.common
@@ -54,7 +56,11 @@
                        :expires (date-str (time/plus (time/now) (time/days 20))
                                           cookie-format)
                        :path "/"}))
-      (redirect "/"))
+      (if-let [uri (get :redirected-from)]
+        (do
+          (remove! :redirected-from)
+          (redirect uri))
+        (redirect "/")))
     (render "/login" usr)))
 
 (defpage "/logout" {}

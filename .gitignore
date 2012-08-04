@@ -8,3 +8,4 @@ mongologs
 *~
 *#
 /target/
+.lein-failures

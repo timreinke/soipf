@@ -13,11 +13,12 @@
 
 (defn valid? [title body]
   (vali/rule (vali/has-value? title) [:title "You must have a title"])
+  (vali/rule (vali/max-length? title 140) [:title "Title must be less than 140 characters"])
   (vali/rule (vali/has-value? body) [:body "You must have a body"])
   (not (vali/errors? :title :body)))
 
 (defn get-thread-listing []
-  (fetch :threads :limit 20 :sort {:updated-at -1}))
+  (fetch :threads :only thread-metadata :limit 20 :sort {:updated-at -1}))
 
 (defn create-thread! [{:keys [title body author]}]
   (when (valid? title body)
