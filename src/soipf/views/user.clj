@@ -39,7 +39,7 @@
            [:div.control-group
             [:div.controls
              (password-field {:placeholder "Confirm Passowrd"} :password-confirm)]]
-           (submit-button "Register")))
+           (submit-button {:class "click-once"} "Register")))
 
 (defpage "/login" {:as usr}
   (if (user/logged-in?)
