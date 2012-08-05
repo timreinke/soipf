@@ -19,7 +19,6 @@ a {
     float:right;
 }
 
-
 .top a {
     color: #eee;
 }
@@ -130,10 +129,16 @@ a {
 
 .post {
     padding: 2px;
+    padding-left: 5px;
 }
 
 .post p {
     margin-bottom: 0.2em;
+    padding-left: 10px;
+}
+
+.post ul, ol {
+    padding-left: 40px;
 }
 
 .metadata {
