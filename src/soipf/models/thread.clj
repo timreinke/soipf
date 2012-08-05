@@ -63,3 +63,32 @@
       :posts (fetch :posts :where {:thread-id thread-id}
                     :skip (get-skip)
                     :limit (get-limit)))))
+
+(defn read-thread! [user-id thread-id reply-index]
+  (let [last-read (fetch-one :last-read
+                             :where {:user-id user-id :thread-id thread-id})]
+    (if last-read
+      (when (> reply-index (:reply-index last-read))
+        (update! :last-read
+                 {:user-id user-id
+                  :thread-id thread-id}
+                 {:user-id user-id
+                  :thread-id thread-id
+                  :reply-index reply-index}
+                 :upsert true))
+      (update! :last-read
+                 {:user-id user-id
+                  :thread-id thread-id}
+                 {:user-id user-id
+                  :thread-id thread-id
+                  :reply-index reply-index}
+                 :upsert true))))
+
+(defn last-posts-read [user-id threads]
+  (let [threads (fetch :last-read :where {:user-id user-id
+                                  :thread-id {:$in threads}}
+                       :only [:thread-id :reply-index])]
+    (reduce (fn [m t]
+              (assoc m (:thread-id t) (:reply-index t)))
+            {}
+            threads)))

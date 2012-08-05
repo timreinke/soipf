@@ -1,19 +1,24 @@
 (ns soipf.views.thread
-  (:refer-clojure :exclude [get swap!])
   (:require [noir.validation :as vali])
-  (:use noir.core
+  (:use [clojure.string :only [join]]
+        noir.core
         noir.request
-        noir.session
         [noir.response :only [redirect status json]]
+        [noir.session :only [put!]]
         hiccup.element
         hiccup.form
         hiccup.page
-        [hiccup.util :only [url]]
+        [hiccup.util :only [url url-encode]]
         soipf.paginate
         soipf.views.common
         [soipf.format :only [date-str]]
-        [soipf.models.thread :only [create-thread! add-reply! get-thread-listing retrieve-thread]]
+        soipf.models.thread
         [soipf.models.user :only [logged-in?]]))
+
+(defn- assoc-index [skip ms]
+  (map (fn [i m]
+         (assoc m :index (+ i skip)))
+       (range) ms))
 
 (defpartial new-thread [{:keys [title body]}]
   (form-to {:class "form-horizontal"} [:post "/thread"]
@@ -23,7 +28,6 @@
             [:div.controls
              (text-field {:class "input-xlarge"} :title title)
              (error-help :title)]]
-
            [:div {:class (error-class :body)}
             [:label {:for "body"} "Body"]
             [:div.controls
@@ -34,25 +38,53 @@
            [:div.form-actions
             [:button.click-once {:type "submit"} "Create Thread"]]))
 
-(defpartial display-post [post]
-  [:div.post
+(defpartial display-post [last-read post]
+  (println last-read (:index post))
+  [:div {:id (:index post)
+         :class (join " "  ["post" (when (>= (:index post) last-read)
+                                     "unread")])}
    [:div.metadata
-    [:span.author (get-in post [:author :login])]
+    [:span.author
+     (get-in post [:author :login])]
     " at "
     (date-str (post :created-at))]
    (post :content)])
 
 (defpartial list-thread [thread]
-  [:div.item [:div.inner (link-to (url-for show-thread {:id (thread :_id)})
-                                                          (thread :title))
-              [:div.info "by " (get-in thread [:author :login])]]])
+  (let [unread-index (- (:reply-count thread)
+                        (:unread thread))]
+    [:div {:class (join " "  ["item" (when-not (zero? (:unread thread))
+                                       "unread")])}
+     [:div.inner (link-to (url (url-for show-thread {:id (thread :_id)})
+                               "?" (url-encode {"skip" (* (get-limit)
+                                                          (int (/ unread-index
+                                                                  (get-limit))))
+                                                "limit" (get-limit)})
+                               "#" (dec unread-index))
+                          (thread :title))
+      (when-not (zero? (:unread thread))
+        [:span.info (str (:unread thread) " unread")])
+      [:div.info "by " (get-in thread [:author :login])]]]))
+
+(defn mark-unread [threads]
+  (if-let [user (logged-in?)]
+    (let [user-id (:_id user)
+          read-posts (last-posts-read user-id (map :_id threads))]
+      (map (fn [t]
+             (let [last-read (get read-posts (:_id t) 0)]
+               (assoc t
+                 :last-read last-read
+                 :unread (- (:reply-count t)
+                            last-read))))
+           threads))
+    threads))
 
 (defpage "/" []
-  (let [threads (get-thread-listing)]
+  (let [threads (mark-unread (get-thread-listing))]
     (layout
      [:div.row
       (link-to {:class "btn btn-primary"} "/thread" "New Thread")]
-     (map list-thread threads))))
+     [:div.threads (map list-thread threads)])))
 
 (defn assert-logged-in []
   (when-not (logged-in?)
@@ -84,19 +116,24 @@
             [:button.click-once {:type "submit"} "Add Reply"]]))
 
 (defpartial display-thread [thread body]
-  (let [pagination (pagination-html (inc (:reply-count thread)))]
+  (let [pagination (pagination-html (:reply-count thread))]
     [:div pagination
      [:div.thread
       [:div.heading
        (link-to (url-for show-thread {:id (thread :_id)}) (thread :title))]
       [:div.content
-       (map display-post (thread :posts))]
+       (map #(display-post (:last-read thread) %)
+            (assoc-index (get-skip) (thread :posts)))]
       (reply-form (thread :_id) body)]
      pagination]))
 
 (defpage show-thread "/thread/:id" {:keys [id body]}
   (if-let [{:keys [_id title author created-at posts] :as thread} (retrieve-thread id)]
-    (layout (display-thread thread body))
+    (let [thread (first (mark-unread [thread]))]
+      (when-let [user (logged-in?)]
+        (read-thread! (:_id user) id (+ (count posts)
+                                        (get-skip))))
+      (layout (display-thread thread body)))
     (status 404 (layout [:h1 "Thread not found"]))))
 
 (defpage reply-to-thread [:post "/thread/:id"] {:keys [id body] :as args}
@@ -104,9 +141,11 @@
     (do (if (add-reply! {:thread-id id
                          :author (logged-in?)
                          :body body})
-          (redirect (url (url-for show-thread {:id id}) {"skip" (get-skip
-                                                        (page-count
-                                                         (inc reply-count)))
-                                                "limit" (get-limit)}))
+          (redirect (url (url-for show-thread {:id id})
+                         {"skip" (get-skip
+                                  (page-count
+                                   ;; inc for new reply
+                                   (inc reply-count)))
+                          "limit" (get-limit)}))
           (render show-thread {:id id :body body})))
     (redirect "/")))
