@@ -10,7 +10,7 @@
   (:use noir.core
         noir.session
         [noir.response :only [redirect]]
-        hiccup.form-helpers
+        hiccup.form
         soipf.views.common
         soipf.format))
 
@@ -30,6 +30,8 @@
 (defpartial registration-form [registration]
   (form-to {:class "well"} [:post (url-for register registration)]
            [:legend "Register"]
+           (error-help :login)
+           (error-help :password)
            [:div {:class (error-class :login)}
             [:div.controls
              (text-field {:placeholder "Username"} :login (:login registration))]]
@@ -74,11 +76,12 @@
      [:h1 "Invitation not found"])))
 
 (defpage do-registration [:post "/register/:invite-id"]
-      {:keys [login password password-confirm invite-id] :as registration}
-  (if (and (user/valid? login password password-confirm)
-           (invitation/valid? invite-id))
-    (let [user (user/create-user! login password)]
-      (invitation/use! invite-id user)
-      (session/put! :user user)
-      (redirect "/"))
+  {:keys [login password password-confirm invite-id] :as registration}
+  (if (invitation/valid? invite-id)
+    (if-let [user (user/create-user! login password password-confirm)]
+      (do
+        (invitation/use! invite-id user)
+        (session/put! :user user)
+        (redirect "/"))
+      (render register registration))
     (render register registration)))

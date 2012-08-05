@@ -11,18 +11,14 @@ a {
     text-decoration: none;
 }
 
+.user-bar {
+    font-size: 0.75em;
+}
+
 .pull-right {
     float:right;
 }
 
-.top {
-    background-color: #05ba8b;
-    color: #eee;
-    padding: 2px;
-    margin: 0px;
-    font-size: 1.2em;
-    font-family: Verdana;
-}
 
 .top a {
     color: #eee;
@@ -32,21 +28,43 @@ a {
     margin-right: 5px;
 }
 
-
 #wrapper {
-    padding: 0px 25px 25px 20px;
-    margin: 10px;
     font-size: 10pt;
-    overflow: visible;
+    min-height: 100%;
+    position: relative;
 }
 
+.top {
+    background-color: #05ba8b;
+    color: #eee;
+    padding: 2px;
+    margin: 0px;
+    font-size: 1.2em;
+    font-family: Verdana;
+    line-height: 1.5em;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    padding-bottom: 10px;
+    color: #888;
+}
+
+#content {
+    padding: 20px;
+    padding-bottom: 4em;
+}
 
 .thread {
     background-color: #05ba8b;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     border-radius: 5px;
-    margin-top: 20px;
+    margin-top: 0.2em;
+    clear: both;
 }
 
 .thread .heading {
@@ -65,7 +83,7 @@ a {
 
 .item {
     background-color: #fff;
-    margin: 5px;
+    margin-top: 5px;
     color: #333;
     border-radius: 5px;
     box-shadow: 0px 0px 3px #888;
@@ -110,34 +128,12 @@ a {
     color: #fff;
 }
 
-ul.topics {
-    list-style-type: none;
-    margin: 0px;
-    padding-left: 10px;
-    padding-top: 5px;
-    width: auto;
-}
-
-ul.topics a {
-    color: #111;
-}
-
-.button {
-    border: none;
-    background: transparent;
-    color: #fff;
-    font-size: 1em;
-    font-family: Arial;
-    cursor: pointer;
-
-}
-
 .post {
-    padding: 5px;
+    padding: 2px;
 }
 
 .post p {
-    margin-bottom: 1em;
+    margin-bottom: 0.2em;
 }
 
 .metadata {
@@ -154,10 +150,29 @@ ul.topics a {
     padding: 20px;
 }
 
+.pagination {
+    padding: 2px;
+    float: right;
+    clear: both;
+}
 
+.pagination a {
+    padding: 2px;
+}
+.pagination span {
+    padding: 2px;
+}
+
+.push {
+    clear: both;
+}
 /*
   #a6c
   #a8d
   #d2d
   #ff0
 */
+
+.help {
+    color: #cc2222;
+}

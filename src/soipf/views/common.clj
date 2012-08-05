@@ -1,9 +1,14 @@
 (ns soipf.views.common
   (:require [soipf.models.user :as user]
             [noir.validation :as vali])
-  (:use [noir.core :only [defpartial]]
-        [hiccup.page-helpers]
-        [hiccup.form-helpers]))
+  (:use [clojure.string :only [join]]
+        [hiccup.core :only [html]]
+        hiccup.element
+        hiccup.page
+        hiccup.util
+        [noir.core :only [defpartial]]
+        noir.request
+        soipf.paginate))
 
 (defn error-class [field]
   (str "control-group"
@@ -11,7 +16,7 @@
          " error")))
 
 (defn error-help [field]
-  (vali/on-error field (fn [es] (list [:br] [:span.help-inline (first es)]))))
+  (vali/on-error field (fn [es] [:div.help (first es)])))
 
 (defpartial error-text [errors]
   [:div.alert (interpose [:br] errors)])
@@ -22,34 +27,57 @@
     (include-css "/css/reset.css"
                  "/css/main.css")])
 
+(defn- uri-with-query-params [uri query-params]
+  (str uri "?"
+       (join "&"
+             (map (fn [entry]
+                    (join "=" (map (comp url-encode str) entry)))
+                  query-params))))
+
+(defn page-range []
+  (map (fn [n]
+         {:n n
+          "skip" (get-skip n)
+          "limit" (get-limit)})
+       (map inc (range))))
+
+(defn page-link [page]
+  (if (= (:n page) (current-page))
+    [:span.page-link (:n page)]
+    (let [{:keys [uri query-params]} (ring-request)
+          query-params (merge query-params (dissoc page :n))]
+      (link-to {:class "page-link"} (url
+                 uri
+                 query-params)
+               (:n page)))))
+
+(defpartial pagination-html [total-items]
+  [:div.pagination "Page " (take (page-count total-items) (map page-link (page-range)))])
 
 (defpartial user-bar []
-  (if-let [user (user/logged-in?)]
-    [:span.pull-right
+  (when-let [user (user/logged-in?)]
+    [:span.pull-right.user-bar
      [:a (:login user)]
      "/"
-     (link-to "/logout" "logout")]
-    (list
-     (form-to {:class "navbar-search pull-right"} [:post "/login"]
-              (text-field {:class "input-small"
-                           :placeholder "Username"} "login")
-              (password-field {:class "input-small"
-                               :placeholder "Password"} "password")
-              (submit-button {:style "position: absolute; left: -9999px; width: 1px; height: 1px"} "")))))
+     (link-to "/logout" "logout")]))
 
 (defpartial page-header []
   [:div.top
    (link-to {:class :title} "/" "soipf")
    (user-bar)])
 
+(defpartial page-footer []
+  [:div.footer [:p "soipf"]])
+
 (defpartial layout [& content]
             (html5
              (head "soipf")
              [:body
-              (page-header)
               [:div#wrapper
+               (page-header)
                [:div#content
-                content]]
-              (map include-js
-                   ["/js/jquery.js"
-                    "/js/app.js"])]))
+                content]
+               (map include-js
+                    ["/js/jquery.js"
+                     "/js/app.js"])
+               (page-footer)]]))

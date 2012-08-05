@@ -7,6 +7,8 @@
         somnium.congomongo))
 
 (defn valid? [login password password-confirm]
+  (vali/rule (vali/min-length? login 1) [:login "Login must be at least 1 character"])
+  (vali/rule (vali/min-length? password 5) [:password "Password must be at least 5 characters"])
   (if (fetch-one :users :where {:login login})
     (vali/set-error :login "Login already exists"))
   (if (not (= password password-confirm))
@@ -15,14 +17,15 @@
     false
     true))
 
-(defn create-user! [login password]
-  (let [salt (crypt/gen-salt)
-        password-hash (crypt/encrypt salt password)]
-    (insert! :users {:_id (new-id "users")
-                     :login login
-                     :salt salt
-                     :password-hash password-hash
-                     :created-at (java.util.Date.)})))
+(defn create-user! [login password password-confirm]
+  (when (valid? login password password-confirm)
+    (let [salt (crypt/gen-salt)
+          password-hash (crypt/encrypt salt password)]
+      (insert! :users {:_id (new-id "users")
+                       :login login
+                       :salt salt
+                       :password-hash password-hash
+                       :created-at (java.util.Date.)}))))
 
 (defn authenticate-user [login password]
   (when-let [{:keys [salt password-hash] :as user}

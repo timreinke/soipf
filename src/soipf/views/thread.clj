@@ -5,8 +5,9 @@
         noir.request
         noir.session
         [noir.response :only [redirect status json]]
-        hiccup.form-helpers
-        hiccup.page-helpers
+        hiccup.element
+        hiccup.form
+        hiccup.page
         soipf.views.common
         [soipf.format :only [date-str]]
         [soipf.models.thread :only [create-thread! add-reply! get-thread-listing retrieve-thread]]

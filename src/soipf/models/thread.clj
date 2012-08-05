@@ -5,8 +5,9 @@
             [clj-time.coerce :as coerce])
   (:use soipf.db
         soipf.format
+        soipf.paginate
         somnium.congomongo
-        [hiccup.core :only [escape-html]]))
+        [hiccup.util :only [escape-html]]))
 
 (def author-keys
   ^{:private true
