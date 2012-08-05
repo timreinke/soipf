@@ -1,4 +1,4 @@
-(ns soipf.api.invitation
+(ns soipf.models.invitation
   (:import (java.security MessageDigest))
   (:use somnium.congomongo
         soipf.db))

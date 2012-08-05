@@ -1,7 +1,7 @@
 (ns soipf.views.user
   (:refer-clojure :exclude [get swap!])
   (:require [soipf.models.user :as user]
-            [soipf.api.invitation :as invitation]
+            [soipf.models.invitation :as invitation]
             [clojure.string :as string]
             [noir.validation :as vali]
             [noir.cookies :as cookies]
