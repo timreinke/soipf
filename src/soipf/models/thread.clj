@@ -30,7 +30,8 @@
 (defn create-thread! [{:keys [title body author]}]
   (when (valid-thread? title body)
     (let [now (java.util.Date.)
-          thread-id (new-id "threads")]
+          thread-id (new-id "threads")
+          author (select-keys author author-keys)]
       (insert! :posts {:_id (new-id "posts")
                        :thread-id thread-id
                        :author author
