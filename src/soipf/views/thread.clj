@@ -8,6 +8,8 @@
         hiccup.element
         hiccup.form
         hiccup.page
+        [hiccup.util :only [url]]
+        soipf.paginate
         soipf.views.common
         [soipf.format :only [date-str]]
         [soipf.models.thread :only [create-thread! add-reply! get-thread-listing retrieve-thread]]
@@ -98,10 +100,13 @@
     (status 404 (layout [:h1 "Thread not found"]))))
 
 (defpage reply-to-thread [:post "/thread/:id"] {:keys [id body] :as args}
-  (if-let [{:keys [_id title posts]} (retrieve-thread id)]
+  (if-let [{:keys [title posts reply-count]} (retrieve-thread id)]
     (do (if (add-reply! {:thread-id id
                          :author (logged-in?)
                          :body body})
-          (render show-thread {:id id})
+          (redirect (url (url-for show-thread {:id id}) {"skip" (get-skip
+                                                        (page-count
+                                                         (inc reply-count)))
+                                                "limit" (get-limit)}))
           (render show-thread {:id id :body body})))
     (redirect "/")))

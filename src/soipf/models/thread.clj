@@ -40,7 +40,7 @@
       (insert! :threads {:_id thread-id
                          :title (escape-html title) :author author
                          :created-at now :updated-at now
-                         :reply-count 0}))))
+                         :reply-count 1}))))
 
 (defn add-reply! [{:keys [thread-id body author]}]
   (when (valid-post? body)
