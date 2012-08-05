@@ -81,14 +81,21 @@ a {
 }
 
 .item {
-    background-color: #fff;
+    background-color: #05ba8b;
     margin-top: 5px;
     color: #333;
     border-radius: 5px;
     box-shadow: 0px 0px 3px #888;
-    border: 1px solid white;
-    padding: 5px;
+    border: 1px solid #aaa;
     display: block;
+}
+
+.item .inner {
+    margin-left: 10px;
+    padding: 5px;
+    background: #fff;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 .item a {

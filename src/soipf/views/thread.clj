@@ -43,9 +43,9 @@
    (post :content)])
 
 (defpartial list-thread [thread]
-  [:div.item (link-to (url-for show-thread {:id (thread :_id)})
-                      (thread :title))
-   [:div.info "by " (get-in thread [:author :login])]])
+  [:div.item [:div.inner (link-to (url-for show-thread {:id (thread :_id)})
+                                                          (thread :title))
+              [:div.info "by " (get-in thread [:author :login])]]])
 
 (defpage "/" []
   (let [threads (get-thread-listing)]
