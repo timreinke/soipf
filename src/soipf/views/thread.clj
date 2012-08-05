@@ -25,7 +25,7 @@
             [:label {:for "body"} "Body"]
             [:div.controls
              [:textarea#body.input-xlarge
-              {:name "body" :rows 6 }
+              {:name "body" :rows 6 :cols 50}
               body]
              (error-help :body)]]
            [:div.form-actions
@@ -51,10 +51,15 @@
       (link-to {:class "btn btn-primary"} "/thread" "New Thread")]
      (map list-thread threads))))
 
+(defn assert-logged-in []
+  (when-not (logged-in?)
+    (put! :redirected-from ((ring-request) :uri))
+    (redirect "/login")))
+
+(pre-route "/" {}
+           (assert-logged-in))
 (pre-route "/thread*" {}
-           (when-not (logged-in?)
-             (put! :redirected-from ((ring-request) :uri))
-             (redirect "/login")))
+           (assert-logged-in))
 
 (defpage "/thread" {:as t}
   (layout (new-thread t)))
@@ -75,21 +80,27 @@
            [:div.form-actions
             [:button.click-once {:type "submit"} "Add Reply"]]))
 
-(defpartial display-thread [thread]
-  [:div.thread
-   [:div.heading
-    (link-to (url-for show-thread {:id (thread :_id)}) (thread :title))]
-   [:div.content
-    (map display-post (thread :posts))]
-   (reply-form (thread :_id) "")])
+(defpartial display-thread [thread body]
+  (let [pagination (pagination-html (inc (:reply-count thread)))]
+    [:div pagination
+     [:div.thread
+      [:div.heading
+       (link-to (url-for show-thread {:id (thread :_id)}) (thread :title))]
+      [:div.content
+       (map display-post (thread :posts))]
+      (reply-form (thread :_id) body)]
+     pagination]))
 
 (defpage show-thread "/thread/:id" {:keys [id body]}
   (if-let [{:keys [_id title author created-at posts] :as thread} (retrieve-thread id)]
-    (layout (display-thread thread))
+    (layout (display-thread thread body))
     (status 404 (layout [:h1 "Thread not found"]))))
 
 (defpage reply-to-thread [:post "/thread/:id"] {:keys [id body] :as args}
-  (if-let [{:keys [_id title posts]} (retrieve-thread id -5)]
-    (do (add-reply! (assoc args :author (logged-in?)))
-        (render show-thread {:id id}))
+  (if-let [{:keys [_id title posts]} (retrieve-thread id)]
+    (do (if (add-reply! {:thread-id id
+                         :author (logged-in?)
+                         :body body})
+          (render show-thread {:id id})
+          (render show-thread {:id id :body body})))
     (redirect "/")))

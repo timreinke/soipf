@@ -8,43 +8,56 @@
         somnium.congomongo
         [hiccup.core :only [escape-html]]))
 
-(def thread-metadata
-  [:title :author :created-at :updated-at :reply-count])
+(def author-keys
+  ^{:private true
+    :doc "The keys of author to put in the thread object"}
+  [:_id :login])
 
-(defn valid? [title body]
+(defn valid-thread? [title body]
   (vali/rule (vali/has-value? title) [:title "You must have a title"])
   (vali/rule (vali/max-length? title 140) [:title "Title must be less than 140 characters"])
   (vali/rule (vali/has-value? body) [:body "You must have a body"])
   (not (vali/errors? :title :body)))
 
+(defn valid-post? [body]
+  (vali/rule (vali/has-value? body) [:body "You must have a body"])
+  (not (vali/errors? :body)))
+
 (defn get-thread-listing []
-  (fetch :threads :only thread-metadata :limit 20 :sort {:updated-at -1}))
+  (fetch :threads :limit 20 :sort {:updated-at -1}))
 
 (defn create-thread! [{:keys [title body author]}]
-  (when (valid? title body)
-    (let [now (java.util.Date.)]
-      (insert! :threads {:_id (new-id "threads")
+  (when (valid-thread? title body)
+    (let [now (java.util.Date.)
+          thread-id (new-id "threads")]
+      (insert! :posts {:_id (new-id "posts")
+                       :thread-id thread-id
+                       :author author
+                       :created-at now
+                       :content (markdownify body)
+                       :raw-content body})
+      (insert! :threads {:_id thread-id
                          :title (escape-html title) :author author
                          :created-at now :updated-at now
-                         :reply-count 0
-                         :posts [{:author author
-                                  :created-at now
-                                  :content (markdownify body)
-                                  :raw-content body}]}))))
+                         :reply-count 0}))))
 
-(defn add-reply! [{:keys [id body author]}]
-  (let [now (java.util.Date.)
-        login (session/get :login "Anonymous")]
-    (update! :threads {:_id id}
-             {:$push {:posts {:author author
-                              :created-at now
-                              :content (markdownify body)
-                              :raw-content body}}
-              :$set {:updated-at now}
-              :$inc {:reply-count 1}})))
+(defn add-reply! [{:keys [thread-id body author]}]
+  (when (valid-post? body)
+    (let [now (java.util.Date.)
+          login (session/get :login "Anonymous")]
+      (insert! :posts {:_id (new-id "posts")
+                       :thread-id thread-id
+                       :author (select-keys author author-keys)
+                       :created-at now
+                       :content (markdownify body)
+                       :raw-content body})
+      (update! :threads {:_id thread-id}
+               {:$set {:updated-at now}
+                :$inc {:reply-count 1}}))))
 
-(defn retrieve-thread
-  ([id]
-     (fetch-one :threads :where {:_id id}))
-  ([id slice]
-     (fetch-one :threads :where {:_id id})))
+(defn retrieve-thread [thread-id]
+  (if-let [thread (fetch-one :threads :where {:_id thread-id})]
+    (assoc thread
+      :posts (fetch :posts :where {:thread-id thread-id}
+                    :skip (get-skip)
+                    :limit (get-limit)))))
