@@ -18,6 +18,10 @@ a {
     float:right;
 }
 
+.row {
+    margin-bottom: 5px;
+}
+
 .top a {
     color: #eee;
 }
@@ -61,7 +65,7 @@ a {
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     border-radius: 5px;
-    margin-top: 0.2em;
+    box-shadow: 0px 0px 3px #888;
     clear: both;
 }
 
@@ -72,7 +76,7 @@ a {
 }
 
 .thread .content {
-    background-color :#fff;
+    background-color: #fff;
 }
 
 .thread .heading a {
@@ -81,7 +85,7 @@ a {
 
 .item {
     background-color: #aaa;
-    margin-top: 5px;
+    margin-bottom: 5px;
     color: #333;
     border-radius: 5px;
     box-shadow: 0px 0px 3px #888;
@@ -92,6 +96,10 @@ a {
     background-color: #ffa977;
 }
 
+a.action {
+    color: #05ba8d;
+    font-weight: bold;
+}
 
 .item .inner {
     margin-left: 10px;
@@ -167,19 +175,13 @@ a {
     font-family: Verdana;
 }
 
-.metadata .unread {
-    /* color: #ffa977; */
-}
-
-.form-horizontal {
-    padding: 20px;
+.well {
+    padding: 10px;
 }
 
 .pagination {
-    padding: 2px;
     float: right;
     clear: both;
-    font-size: 1.2em;
     font-weight: bold;
 }
 
@@ -188,7 +190,7 @@ a {
     color: #05ba8d;
 }
 .pagination span {
-    padding: 2px;
+    padding: 0 2px 0 2px;
 }
 
 .push {
@@ -203,4 +205,5 @@ a {
 
 .help {
     color: #cc2222;
+    font-weight: bold;
 }

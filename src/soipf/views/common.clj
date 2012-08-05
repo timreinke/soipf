@@ -52,7 +52,7 @@
                (:n page)))))
 
 (defpartial pagination-html [total-items]
-  [:div.pagination "Page " (take (page-count total-items) (map page-link (page-range)))])
+  [:div.pagination.row "Page " (take (page-count total-items) (map page-link (page-range)))])
 
 (defpartial user-bar []
   (when-let [user (user/logged-in?)]

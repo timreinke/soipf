@@ -83,7 +83,7 @@
   (let [threads (mark-unread (get-thread-listing))]
     (layout
      [:div.row
-      (link-to {:class "btn btn-primary"} "/thread" "New Thread")]
+      (link-to {:class "action"} "/thread" "new thread")]
      [:div.threads (map list-thread threads)])))
 
 (defn assert-logged-in []
