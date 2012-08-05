@@ -47,8 +47,8 @@
     (let [{:keys [uri query-params]} (ring-request)
           query-params (merge query-params (dissoc page :n))]
       (link-to {:class "page-link"} (url
-                 uri
-                 query-params)
+                                     uri
+                                     query-params)
                (:n page)))))
 
 (defpartial pagination-html [total-items]
