@@ -159,10 +159,13 @@ a {
     padding: 2px;
     float: right;
     clear: both;
+    font-size: 1.2em;
+    font-weight: bold;
 }
 
 .pagination a {
     padding: 2px;
+    color: #05ba8b;
 }
 .pagination span {
     padding: 2px;
