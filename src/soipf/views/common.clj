@@ -27,13 +27,6 @@
     (include-css "/css/reset.css"
                  "/css/main.css")])
 
-(defn- uri-with-query-params [uri query-params]
-  (str uri "?"
-       (join "&"
-             (map (fn [entry]
-                    (join "=" (map (comp url-encode str) entry)))
-                  query-params))))
-
 (defn page-range []
   (map (fn [n]
          {:n n

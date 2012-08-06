@@ -39,7 +39,6 @@
             [:button.click-once {:type "submit"} "Create Thread"]]))
 
 (defpartial display-post [last-read post]
-  (println last-read (:index post))
   [:div {:id (:index post)
          :class (join " "  ["post" (when (>= (:index post) last-read)
                                      "unread")])}
@@ -56,10 +55,7 @@
     [:div {:class (join " "  ["item" (when-not (zero? (:unread thread))
                                        "unread")])}
      [:div.inner (link-to (url (url-for show-thread {:id (thread :_id)})
-                               "?" (url-encode {"skip" (* (get-limit)
-                                                          (int (/ unread-index
-                                                                  (get-limit))))
-                                                "limit" (get-limit)})
+                               "?" (query-str-by-index unread-index)
                                "#" (dec unread-index))
                           (thread :title))
       (when-not (zero? (:unread thread))
@@ -142,10 +138,8 @@
                          :author (logged-in?)
                          :body body})
           (redirect (url (url-for show-thread {:id id})
-                         {"skip" (get-skip
-                                  (page-count
-                                   ;; inc for new reply
-                                   (inc reply-count)))
-                          "limit" (get-limit)}))
+                         (page-query-by-index
+                          ;; inc for new reply
+                          (inc reply-count))))
           (render show-thread {:id id :body body})))
     (redirect "/")))

@@ -23,3 +23,12 @@
     (if (= (class date) org.joda.time.DateTime)
       (format/unparse format date)
       (date-str (coerce/from-date date) format))))
+
+(defn relative-time [hours days weeks months years]
+  (let [s? #(if (not (= 1 %)) "s")]
+    (cond
+     (< hours 24) (str hours " hour" (s? hours) " ago")
+     (< days 7) (str days " day" (s? days) " ago")
+     (< weeks 4) (str weeks " week" (s? weeks) " ago")
+     (< months 12) (str months " month" (s? months) " ago")
+     :default (str years " year" (s? years) " ago"))))
