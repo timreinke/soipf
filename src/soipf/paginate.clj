@@ -11,17 +11,19 @@
      (Integer/parseInt (get-in (ring-request) [:params :skip] "0")))
   ([page]
      (* (get-limit)
-        (- page 1))))
+        (dec page))))
 
 (defn page-map [skip limit]
   {:skip skip
    :limit limit})
 
 (defn current-page []
-  (+ 1 (int (/ (get-skip) (get-limit)))))
+  (inc (int (/ (get-skip)
+               (get-limit)))))
 
 (defn page-count [total-items]
-  (+ 1 (int (/ (- total-items 1) (get-limit)))))
+  (inc (int (/ (dec total-items)
+               (get-limit)))))
 
 (defn page-query-by-index [index]
   (page-map

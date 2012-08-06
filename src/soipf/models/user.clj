@@ -11,7 +11,7 @@
   (vali/rule (vali/min-length? password 5) [:password "Password must be at least 5 characters"])
   (if (fetch-one :users :where {:login login})
     (vali/set-error :login "Login already exists"))
-  (if (not (= password password-confirm))
+  (if (not= password password-confirm)
     (vali/set-error :password "Passwords don't match"))
   (if (vali/errors?)
     false

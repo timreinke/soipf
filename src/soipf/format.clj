@@ -25,7 +25,7 @@
       (date-str (coerce/from-date date) format))))
 
 (defn relative-time [hours days weeks months years]
-  (let [s? #(if (not (= 1 %)) "s")]
+  (let [s? #(if (not= 1 %) "s")]
     (cond
      (< hours 24) (str hours " hour" (s? hours) " ago")
      (< days 7) (str days " day" (s? days) " ago")
