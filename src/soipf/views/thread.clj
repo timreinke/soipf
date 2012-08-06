@@ -8,7 +8,7 @@
         hiccup.element
         hiccup.form
         hiccup.page
-        [hiccup.util :only [url url-encode]]
+        [hiccup.util :only [url]]
         soipf.paginate
         soipf.views.common
         [soipf.format :only [date-str]]
@@ -19,6 +19,24 @@
   (map (fn [i m]
          (assoc m :index (+ i skip)))
        (range) ms))
+
+(defn mark-unread [threads]
+  (if-let [user (logged-in?)]
+    (let [user-id (:_id user)
+          read-posts (last-posts-read user-id (map :_id threads))]
+      (map (fn [t]
+             (let [last-read (get read-posts (:_id t) 0)]
+               (assoc t
+                 :last-read last-read
+                 :unread (- (:reply-count t)
+                            last-read))))
+           threads))
+    threads))
+
+(defn assert-logged-in []
+  (when-not (logged-in?)
+    (put! :redirected-from ((ring-request) :uri))
+    (redirect "/login")))
 
 (defpartial new-thread [{:keys [title body]}]
   (form-to {:class "form-horizontal"} [:post "/thread"]
@@ -62,44 +80,6 @@
         [:span.info (str (:unread thread) " unread")])
       [:div.info "by " (get-in thread [:author :login])]]]))
 
-(defn mark-unread [threads]
-  (if-let [user (logged-in?)]
-    (let [user-id (:_id user)
-          read-posts (last-posts-read user-id (map :_id threads))]
-      (map (fn [t]
-             (let [last-read (get read-posts (:_id t) 0)]
-               (assoc t
-                 :last-read last-read
-                 :unread (- (:reply-count t)
-                            last-read))))
-           threads))
-    threads))
-
-(defpage "/" []
-  (let [threads (mark-unread (get-thread-listing))]
-    (layout
-     [:div.row
-      (link-to {:class "action"} "/thread" "new thread")]
-     [:div.threads (map list-thread threads)])))
-
-(defn assert-logged-in []
-  (when-not (logged-in?)
-    (put! :redirected-from ((ring-request) :uri))
-    (redirect "/login")))
-
-(pre-route "/" {}
-           (assert-logged-in))
-(pre-route "/thread*" {}
-           (assert-logged-in))
-
-(defpage "/thread" {:as t}
-  (layout (new-thread t)))
-
-(defpage [:post "/thread"] {:keys [title body] :as t}
-  (if-let [thread (create-thread! (assoc t :author (logged-in?)))]
-    (redirect (url-for show-thread {:id (:_id thread)}))
-    (render "/thread" t)))
-
 (defpartial reply-form [id body]
   (form-to {:class "form-horizontal well"} [:post (url-for reply-to-thread {:id id})]
            [:div {:class (error-class :body)}
@@ -123,6 +103,26 @@
       (reply-form (thread :_id) body)]
      pagination]))
 
+(pre-route "/" {}
+           (assert-logged-in))
+(pre-route "/thread*" {}
+           (assert-logged-in))
+
+(defpage "/" []
+  (let [threads (mark-unread (get-thread-listing))]
+    (layout
+     [:div.row
+      (link-to {:class "action"} "/thread" "new thread")]
+     [:div.threads (map list-thread threads)])))
+
+(defpage "/thread" {:as t}
+  (layout (new-thread t)))
+
+(defpage [:post "/thread"] {:keys [title body] :as t}
+  (if-let [thread (create-thread! (assoc t :author (logged-in?)))]
+    (redirect (url-for show-thread {:id (:_id thread)}))
+    (render "/thread" t)))
+
 (defpage show-thread "/thread/:id" {:keys [id body]}
   (if-let [{:keys [_id title author created-at posts] :as thread} (retrieve-thread id)]
     (let [thread (first (mark-unread [thread]))]
@@ -134,12 +134,12 @@
 
 (defpage reply-to-thread [:post "/thread/:id"] {:keys [id body] :as args}
   (if-let [{:keys [title posts reply-count]} (retrieve-thread id)]
-    (do (if (add-reply! {:thread-id id
-                         :author (logged-in?)
-                         :body body})
-          (redirect (url (url-for show-thread {:id id})
-                         (page-query-by-index
-                          ;; inc for new reply
-                          (inc reply-count))))
-          (render show-thread {:id id :body body})))
+    (if (add-reply! {:thread-id id
+                     :author (logged-in?)
+                     :body body})
+      (redirect (url (url-for show-thread {:id id})
+                     (page-query-by-index
+                      ;; inc for new reply
+                      (inc reply-count))))
+      (render show-thread {:id id :body body}))
     (redirect "/")))

@@ -25,7 +25,7 @@
   (not (vali/errors? :body)))
 
 (defn get-thread-listing []
-  (fetch :threads :limit 20 :sort {:updated-at -1}))
+  (fetch :threads :limit (get-limit) :sort {:updated-at -1}))
 
 (defn create-thread! [{:keys [title body author]}]
   (when (valid-thread? title body)
@@ -76,13 +76,10 @@
                   :thread-id thread-id
                   :reply-index reply-index}
                  :upsert true))
-      (update! :last-read
-                 {:user-id user-id
-                  :thread-id thread-id}
+      (insert! :last-read
                  {:user-id user-id
                   :thread-id thread-id
-                  :reply-index reply-index}
-                 :upsert true))))
+                  :reply-index reply-index}))))
 
 (defn last-posts-read [user-id threads]
   (let [threads (fetch :last-read :where {:user-id user-id
