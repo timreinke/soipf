@@ -16,7 +16,7 @@
     (map drop-coll! cs)))
 
 (defn users
-  ([f] (users f ["tim" "password"]))
+  ([f] (users f ["tim" "password" "password"]))
   ([f & logins]
      (dorun (map #(apply create-user! %) logins))
      (f)

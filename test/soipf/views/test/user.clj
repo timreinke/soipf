@@ -1,4 +1,4 @@
-(ns soipf.views.test.thread
+(ns soipf.views.test.user
   (:use soipf.test.fixtures
         soipf.models.user
         clojure.test
@@ -6,12 +6,11 @@
         somnium.congomongo
         clojure.pprint))
 
+#_(use-fixtures :once (compose-fixtures mongo-connection users))
 
-(use-fixtures :once (compose-fixtures mongo-connection users))
+#_(use-fixtures :each reset-session)
 
-(use-fixtures :each reset-session)
-
-(deftest authentication
+#_(deftest authentication
   (with-noir
     (testing "a successful login redirects"
       (let [resp (send-request [:post "/login"]
@@ -25,7 +24,7 @@
     ;; cookie (the cookies/get call returns nil and causes an exception in the stack).
     ;; The code works as long as a POST /login request is not the first request made, which
     ;; under normal circumstances it would not be.
-    #_(testing "a user logging in persistently receives a cookie expiring in the future"
+    (testing "a user logging in persistently receives a cookie expiring in the future"
         (let [resp (send-request [:post "/login"]
                                  {:login "tim" :password "password" :persistent "true"})]
           (has-status resp 302)
