@@ -261,7 +261,7 @@ a.action {
     color: #ddd;
     padding: 0px;
     line-height: 20px;
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 .form div {
@@ -282,4 +282,5 @@ a.action {
     width: 100px;
     margin-left: 70px;
     margin-top: 20px;
+    height: 25px;
 }
