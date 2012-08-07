@@ -28,20 +28,25 @@
            (submit-button "Login")))
 
 (defpartial registration-form [registration]
-  (form-to {:class "well"} [:post (url-for register registration)]
-           [:legend "Register"]
-           (error-help :login)
-           (error-help :password)
-           [:div {:class (error-class :login)}
-            [:div.controls
-             (text-field {:placeholder "Username"} :login (:login registration))]]
-           [:div {:class (error-class :password)}
-            [:div.controls
-             (password-field {:placeholder "Password"} :password)]]
-           [:div.control-group
-            [:div.controls
-             (password-field {:placeholder "Confirm Passowrd"} :password-confirm)]]
-           (submit-button {:class "click-once"} "Register")))
+  [:div.registration
+   [:div.background "welcome"]
+   [:div.container
+    [:div.form
+     [:div.title "Registration"]
+     (form-to [:post (url-for register registration)]
+              [:div {:class (error-class :login)}
+               (text-field {:class "input" :placeholder "Username"}
+                           :login (:login registration))]
+
+              [:div {:class (error-class :password)}
+               (password-field {:class "input" :placeholder "Password"}
+                               :password)]
+
+              [:div
+               (password-field {:class "input" :placeholder "Confirm Password"}
+                               :password-confirm)]
+              [:button {:type "submit"
+                        :class "submit click-once"} "Register"])]]])
 
 (defpage "/login" {:as usr}
   (if (user/logged-in?)

@@ -208,3 +208,78 @@ a.action {
     color: #cc2222;
     font-weight: bold;
 }
+
+.registration {
+    width: 960px;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    height: 400px;
+    padding: 0;
+    z-index: 0;
+}
+
+.registration .background {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-size: 200px;
+    padding: 0;
+    margin: 0;
+    color: #aaa;
+    z-index: -1;
+    padding: 0;
+    top: 50%;
+    height: 200px;
+    margin-top: -100px;
+    line-height: 150px;
+}
+
+.registration .container {
+    width: 480px;
+    background-color: rgba(255, 255, 255, 0.92);
+    z-index: 10;
+    padding: 0;
+    position: absolute;
+    top: 50%;
+    left: 240px;
+    height: 300px;
+    margin-top: -150px;
+}
+
+.registration .form {
+    width: 240px;
+    margin-left: 120px;
+    font-size: 20px;
+    z-index: 100;
+}
+
+.form .title {
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #ddd;
+    padding: 0px;
+    line-height: 20px;
+    margin-top: 20px;
+}
+
+.form div {
+    margin-top: 30px;
+}
+
+.form .input {
+    height: 30px;
+    font-size: 20px;
+    width: 240px;
+}
+
+.form .submit {
+    background: #05ba8d;
+    border: none;
+    color: #fff;
+    font-size: 15px;
+    width: 100px;
+    margin-left: 70px;
+    margin-top: 20px;
+}
