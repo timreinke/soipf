@@ -9,3 +9,5 @@ mongologs
 *#
 /target/
 .lein-failures
+
+logs
