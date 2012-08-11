@@ -29,5 +29,5 @@
                    :used true}}))
 
 (defn valid? [id]
-  (let [invite (retrieve id)]
-    (not (:used invite))))
+  (if-let [invite (retrieve id)]
+    (not (get invite :used true))))
