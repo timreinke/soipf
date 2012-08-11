@@ -7,7 +7,7 @@
   (:gen-class
    :main true))
 
-(server/load-views "src/soipf/views/")
+(server/load-views-ns 'soipf.views)
 
 (defn wrap-mongo [handler]
   (fn [request]
