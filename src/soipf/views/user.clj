@@ -48,6 +48,9 @@
               [:button {:type "submit"
                         :class "submit click-once"} "Register"])]]])
 
+(defpartial invite-not-found []
+  [:h1 "Invitation not found"])
+
 (defpage "/login" {:as usr}
   (if (user/logged-in?)
     (redirect "/")
@@ -76,17 +79,17 @@
 
 (defpage register "/register/:invite-id" {:as registration}
   (layout
-   (if (invitation/valid? (:invite-id registration))
-     (registration-form registration)
-     [:h1 "Invitation not found"])))
+   (if (invitation/invitation-consumed? (:invite-id registration))
+     (invite-not-found)
+     (registration-form registration))))
 
 (defpage do-registration [:post "/register/:invite-id"]
   {:keys [login password password-confirm invite-id] :as registration}
-  (if (invitation/valid? invite-id)
+  (if (invitation/invitation-consumed? invite-id)
+    (invite-not-found)
     (if-let [user (user/create-user! login password password-confirm)]
       (do
-        (invitation/use! invite-id user)
+        (invitation/consume-invitation! invite-id user)
         (session/put! :user user)
         (redirect "/"))
-      (render register registration))
-    (render register registration)))
+      (render register registration))))

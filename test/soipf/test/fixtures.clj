@@ -22,6 +22,14 @@
      (f)
      (drop-coll! :users)))
 
+(defn invitations [f]
+  (insert! :invitations {:_id "unused"
+                         :used false})
+  (insert! :invitations {:_id "used"
+                         :used true})
+  (f)
+  (drop-coll! :invitations))
+
 (defn reset-session [f]
   (reset! noir.session/mem {})
   (f))

@@ -1,39 +1,40 @@
 (ns soipf.views.test.user
   (:use soipf.test.fixtures
         soipf.models.user
+        soipf.models.invitation
         clojure.test
-        noir.util.test
+        noir.util.test2
         somnium.congomongo
         clojure.pprint))
 
-#_(use-fixtures :once (compose-fixtures mongo-connection users))
+(use-fixtures :once (compose-fixtures mongo-connection invitations))
 
-#_(use-fixtures :each reset-session)
+(use-fixtures :each reset-session)
 
-#_(deftest authentication
-  (with-noir
-    (testing "a successful login redirects"
-      (let [resp (send-request [:post "/login"]
-                               {:login "tim" :password "password"})]
-        (has-status resp 302)))
+(def ^{:private true} registration-data
+  {:login "unused"
+   :password "samep"
+   :password-confirm "samep"})
 
-    ;; The current login code performs
-    ;; (cookies/put! :ring-session
-    ;;    {:value (cookies/get :ring-session) :expires ~future})
-    ;; So when we make the request below, there is a 500 error as there is no ring-session
-    ;; cookie (the cookies/get call returns nil and causes an exception in the stack).
-    ;; The code works as long as a POST /login request is not the first request made, which
-    ;; under normal circumstances it would not be.
-    (testing "a user logging in persistently receives a cookie expiring in the future"
-        (let [resp (send-request [:post "/login"]
-                                 {:login "tim" :password "password" :persistent "true"})]
-          (has-status resp 302)
-          (is (re-matches
-               #"Expires"
-               (first (get-in resp [:headers "Set-Cookie"] [""]))))))
+(deftest test-invitations
+  (testing "display valid invitation"
+    (-> (send-request [:get "/register/unused"])
+        (has-status 200)
+        (body-contains #"Registration")
+        (!body-contains #"Invitation not found")))
 
-    (testing "a user with the wrong password is denied"
-      (let [resp (send-request [:post "/login"]
-                               {:login "tim" :password "wrong"})]
-        (has-status resp 200)
-        (is (.contains (:body resp) "Invalid username or password"))))))
+  (testing "use valid invitation"
+    (-> (send-request [:post "/register/unused"]
+                      registration-data)
+        (has-status 302))
+    (is (invitation-consumed? "unused") "Invitation was not consumed")
+    (is (= (:login (invitation-used-by "unused")) (:login registration-data))))
+
+  (testing "invalid invitation"
+    (-> (send-request [:get "/register/used"])
+        (has-status 200)
+        (body-contains #"Invitation not found"))
+    (-> (send-request [:post "/register/used"]
+                      registration-data)
+        (has-status 200)
+        (body-contains #"Invitation not found"))))
