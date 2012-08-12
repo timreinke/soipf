@@ -7,7 +7,7 @@
                             :exclusions [ring/ring-core
                                          ring/ring-devel
                                          ring/jetty-adapter
-                                         ring/ring]]
+                                         ring]]
                            [congomongo "0.1.11-SNAPSHOT"]
                            [clj-time "0.3.4"]
                            [org.pegdown/pegdown "1.1.0"]
