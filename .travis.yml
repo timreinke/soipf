@@ -1,3 +1,7 @@
 language: clojure
 lein: lein2
 script: lein2 midje
+notifications:
+  webhooks:
+    urls:
+      http://requestb.in/1ch4zww1
