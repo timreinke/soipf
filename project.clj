@@ -10,6 +10,7 @@
                            [log4j/log4j "1.2.17"]]
             :profiles {:dev {:dependencies
                              [[midje "1.4.0" :exclusions [org.clojure/clojure]]
+                              [lein-midje "2.0.0-SNAPSHOT"]
                               [noir-test2 "1.0.0-SNAPSHOT"]]}}
             :main soipf.server
             :checksum :warn
