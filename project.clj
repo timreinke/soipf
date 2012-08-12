@@ -3,7 +3,11 @@
             :dependencies [[org.clojure/clojure "1.3.0"]
                            [org.clojure/tools.logging "0.2.4"]
                            [noir "1.3.0-beta8"]
-                           [ring-anti-forgery "0.1.1"]
+                           [ring-anti-forgery "0.1.1"
+                            :exclusions [ring/ring-core
+                                         ring/ring-devel
+                                         ring/jetty-adapter
+                                         ring/ring]]
                            [congomongo "0.1.11-SNAPSHOT"]
                            [clj-time "0.3.4"]
                            [org.pegdown/pegdown "1.1.0"]
