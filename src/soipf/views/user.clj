@@ -77,13 +77,23 @@
   (user/logout)
   (redirect "/"))
 
-(defpage register "/register/:invite-id" {:as registration}
+(defpage registration "/register" {:as registration}
+  (layout
+   (registration-form registration)))
+
+(defpage register [:post "/register"] {:keys [login password password-confirm]
+                                       :as registration}
+  (if-let [user (user/create-user! login password password-confirm)]
+    (do (session/put! :user user)
+        (redirect "/"))))
+
+(defpage invitation "/register/:invite-id" {:as registration}
   (layout
    (if (invitation/invitation-consumed? (:invite-id registration))
      (invite-not-found)
      (registration-form registration))))
 
-(defpage do-registration [:post "/register/:invite-id"]
+(defpage use-invitation [:post "/register/:invite-id"]
   {:keys [login password password-confirm invite-id] :as registration}
   (if (invitation/invitation-consumed? invite-id)
     (invite-not-found)
