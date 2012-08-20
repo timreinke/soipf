@@ -9,6 +9,7 @@
             [clj-time.core :as time])
   (:use noir.core
         noir.session
+        noir.request
         [noir.response :only [redirect]]
         hiccup.form
         soipf.views.common
@@ -27,26 +28,34 @@
            (hidden-field "persistent" "true")
            (submit-button "Login")))
 
+(defpartial warning [errors]
+  [:div.warning
+   (for [e errors] [:p e])])
+
 (defpartial registration-form [registration]
-  [:div.registration
-   [:div.background "welcome"]
-   [:div.container
-    [:div.form
-     [:div.title "Registration"]
-     (form-to [:post (url-for register registration)]
-              [:div {:class (error-class :login)}
-               (text-field {:class "input" :placeholder "Username"}
-                           :login (:login registration))]
+  (list
+   (if (vali/errors?)
+     (warning (filter identity
+                      (mapcat identity (map vali/get-errors [:login :password])))))
+   [:div.registration
+    [:div.background "welcome"]
+    [:div.container
+     [:div.form
+      [:div.title "Registration"]
+      (form-to [:post (url-for ((ring-request) :uri) registration)]
+               [:div.login
+                (text-field {:class "input" :placeholder "Username"}
+                            :login (:login registration))]
 
-              [:div {:class (error-class :password)}
-               (password-field {:class "input" :placeholder "Password"}
-                               :password)]
+               [:div.password
+                (password-field {:class "input" :placeholder "Password"}
+                                :password)]
 
-              [:div
-               (password-field {:class "input" :placeholder "Confirm Password"}
-                               :password-confirm)]
-              [:button {:type "submit"
-                        :class "submit click-once"} "Register"])]]])
+               [:div
+                (password-field {:class "input" :placeholder "Confirm Password"}
+                                :password-confirm)]
+               [:button {:type "submit"
+                         :class "submit click-once"} "Register"])]]]))
 
 (defpartial invite-not-found []
   [:h1 "Invitation not found"])
@@ -77,15 +86,16 @@
   (user/logout)
   (redirect "/"))
 
-(defpage registration "/register" {:as registration}
+(defpage "/register" {:as registration}
   (layout
    (registration-form registration)))
 
-(defpage register [:post "/register"] {:keys [login password password-confirm]
+(defpage [:post "/register"] {:keys [login password password-confirm]
                                        :as registration}
   (if-let [user (user/create-user! login password password-confirm)]
     (do (session/put! :user user)
-        (redirect "/"))))
+        (redirect "/"))
+    (render "/register" registration)))
 
 (defpage invitation "/register/:invite-id" {:as registration}
   (layout
@@ -102,4 +112,4 @@
         (invitation/consume-invitation! invite-id user)
         (session/put! :user user)
         (redirect "/"))
-      (render register registration))))
+      (render invitation registration))))

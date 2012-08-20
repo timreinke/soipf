@@ -209,6 +209,20 @@ a.action {
     font-weight: bold;
 }
 
+.warning {
+    background-color: #faff9c;
+    color: #cccc;
+    text-align: center;
+    width: 240px;
+    padding: 5px;
+    margin: 10px auto 0 auto;
+    border: dashed #c1c478 1px;
+}
+
+.warning p {
+    padding: 5px;
+}
+
 .registration {
     width: 960px;
     position: relative;
