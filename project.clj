@@ -7,6 +7,10 @@
                            [congomongo "0.1.11-SNAPSHOT"]
                            [clj-time "0.3.4"]
                            [org.pegdown/pegdown "1.1.0"]
+                           [org.clojars.hozumi/mongodb-session "1.0.1"
+                            :exclusions [org.clojure/clojure
+                                         ring/ring-core
+                                         congomongo]]
                            [log4j/log4j "1.2.17"]]
             :profiles {:dev
                        {:dependencies

@@ -1,6 +1,7 @@
 (ns soipf.server
   (:use [ring.middleware.anti-forgery :only [wrap-anti-forgery]]
-        [clojure.tools.logging :only [info]])
+        [clojure.tools.logging :only [info]]
+        [hozumi.mongodb-session :only [mongodb-store]])
   (:require [noir.server :as server]
             [soipf.db :as db]
             [somnium.congomongo :as mongo])
@@ -8,6 +9,8 @@
    :main true))
 
 (server/load-views-ns 'soipf.views)
+
+(mongo/mongo! :db "soipf")
 
 (defn wrap-mongo [handler]
   (fn [request]
@@ -46,4 +49,5 @@
   (let [mode (keyword (or (first m) :dev))
         port (Integer. (get (System/getenv) "PORT" "8080"))]
     (server/start port {:mode mode
+                        :session-store (mongodb-store)
                         :ns 'soipf})))
