@@ -1,5 +1,6 @@
 (ns soipf.resources.test.user
-  (:require [midge.sweet :refer :all]
+  (:require [midje.sweet :refer :all]
+            [soipf.resources :refer [fetch get-context authorized-for]]
             [soipf.resources.user :refer [get-user]]))
 
 (facts "about retrieving users"
