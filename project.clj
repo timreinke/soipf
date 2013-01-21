@@ -1,6 +1,6 @@
 (defproject soipf "0.0.1-SNAPSHOT"
             :description "A simple forum application"
-            :dependencies [[org.clojure/clojure "1.3.0"]
+            :dependencies [[org.clojure/clojure "1.4.0"]
                            [org.clojure/tools.logging "0.2.4"]
                            [ring-anti-forgery "0.1.1"]
                            [congomongo "0.1.11-SNAPSHOT"]
