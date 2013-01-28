@@ -1,4 +1,4 @@
 (ns soipf.resources)
 
-(def get-context)
-(def authorized-for?)
+(defn get-context [& args] nil)
+(defn authorized-for? [& args] true)
