@@ -1,16 +1,21 @@
 (ns soipf.resources.user
-  (:require [soipf.resources :refer [fetch get-context authorized-for?]]))
+  (:require [soipf.resources :refer [get-context authorized-for?]]
+            [soipf.db :refer [fetch]]
+            [soipf.util :refer [defkeys]]))
 
-(def default-view #{:id :login :created-at})
-(def auth-view #{:password-hash :salt})
+(defkeys :soipf.user
+  :login
+  :password-hash)
+
+(def default-view #{login})
+(def auth-view #{:password-hash})
 
 (defn get-user
-  ([login]
-     (get-user login {}))
-  ([login query-params]
+  ([login*]
+     (get-user login* default-view))
+  ([login* fields]
      (let [user (get-context [:session :current-user])
-           fields (or (query-params :fields) default-view)
            authorized? (authorized-for? user :get fields)]
        (if (not authorized?)
          (throw (Exception.)))
-       (fetch :users login {:fields fields}))))
+       (fetch {login login*} fields))))
