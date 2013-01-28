@@ -20,9 +20,7 @@
            authorized? (authorized-for? user :get fields)]
        (if (not authorized?)
          (throw (Exception.)))
-       (let [res (fetch {login login*} fields)]
-         (println (str "result: " res))
-         res))))
+       (fetch {login login*} fields))))
 
 (defroutes routes
   (GET "/:login" [login]
