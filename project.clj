@@ -2,11 +2,13 @@
             :description "A simple forum application"
             :dependencies [[org.clojure/clojure "1.4.0"]
                            [org.clojure/tools.logging "0.2.4"]
+                           [compojure "1.1.5"]
                            [ring-anti-forgery "0.1.1"]
                            [clj-time "0.3.4"]
                            [com.datomic/datomic-free "0.8.3767"]
                            [org.pegdown/pegdown "1.1.0"]
                            [log4j/log4j "1.2.17"]]
+            :plugins [[lein-ring "0.8.0"]]
             :profiles {:dev
                        {:dependencies
                         [[midje "1.4.0" :exclusions [org.clojure/clojure]]]
@@ -14,4 +16,6 @@
                         [[lein-midje "2.0.4"]]}}
             :main soipf.server
             :checksum :warn
-            :uberjar-exclusions [#"META-INF/ECLIPSEF.SF"])
+            :uberjar-exclusions [#"META-INF/ECLIPSEF.SF"]
+
+            :ring {:handler soipf.app/handler})
