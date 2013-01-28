@@ -8,7 +8,7 @@
   :password-hash)
 
 (def default-view #{login})
-(def auth-view #{:password-hash})
+(def auth-view #{password-hash})
 
 (defn get-user
   ([login*]
