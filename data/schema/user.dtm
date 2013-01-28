@@ -1,0 +1,16 @@
+;; data User = User {login :: String, passwordHash :: String}
+[{:db/id #db/id[:db.part/db]
+  :db/ident :soipf.user/login
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/fulltext true
+  :db/unique :db.unique/identity
+  :db/doc "The identifier a user uses to login.  At this time, it is also the display name for the user."
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id[:db.part/db]
+  :db/ident :soipf.user/password-hash
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc "The salted hash of the user's password."
+  :db.install/_attribute :db.part/db}]

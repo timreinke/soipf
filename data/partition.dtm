@@ -1,0 +1,3 @@
+[{:db/id #db/id[:db.part/db]
+  :db/ident :db.part/soipf
+  :db.install/_partition :db.part/db}]
