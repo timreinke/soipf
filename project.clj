@@ -18,4 +18,5 @@
             :checksum :warn
             :uberjar-exclusions [#"META-INF/ECLIPSEF.SF"]
 
-            :ring {:handler soipf.app/handler})
+            :ring {:handler soipf.app/handler
+                   :init soipf.init/init})
