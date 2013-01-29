@@ -1,7 +1,7 @@
 (ns soipf.db
   (:require [datomic.api :as d :refer [q db]]))
 
-(def conn (d/connect "datomic:free://localhost:4334/soipf"))
+(def conn nil)
 
 (defn set-connection-globally [uri]
   (alter-var-root conn (fn [_] (d/connect uri))))
