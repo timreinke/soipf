@@ -5,6 +5,12 @@
             [compojure.core :refer [defroutes GET]]
             [compojure.response :refer [render]]))
 
+;; I'd rather like the following to be more like
+;; (defviews :soipf.user
+;;   default [:login]
+;;   authentication [:login :password-hash])
+;; (fetch-view authentication :where [:login "tim"])
+
 (defkeys :soipf.user
   :login
   :password-hash)
