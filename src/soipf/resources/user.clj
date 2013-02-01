@@ -26,7 +26,7 @@
            authorized? (authorized-for? user :get fields)]
        (if (not authorized?)
          (throw (Exception.)))
-       (fetch {login login*} fields))))
+       (fetch login login* fields))))
 
 (defroutes routes
   (GET "/:login" [login]
