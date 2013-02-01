@@ -4,7 +4,7 @@
 (declare conn)
 
 (defn set-connection-globally [uri]
-  (alter-var-root conn (fn [_] (d/connect uri))))
+  (alter-var-root #'conn (fn [_] (d/connect uri))))
 
 (defn fetch
   "Returns the first result found by the map `matches` as a map"
