@@ -11,7 +11,7 @@
             :plugins [[lein-ring "0.8.0"]]
             :profiles {:dev
                        {:dependencies
-                        [[midje "1.4.0" :exclusions [org.clojure/clojure]]
+                        [[midje "1.5-alpha10" :exclusions [org.clojure/clojure]]
                          [ring-serve "0.1.2"]
                          [ring-server "0.2.7"]
                          [ring-refresh "0.1.2"]]

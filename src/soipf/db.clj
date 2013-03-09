@@ -11,9 +11,14 @@
   [key value fields]
   (let [results (q '[:find ?e :in $ ?key ?value :where [?e ?key ?value]]
                    (db conn) key value)
-        eid (ffirst results)
-        entity (-> conn db (d/entity eid))]
-    (into {} (map
-              (fn [field]
-                [field (field entity)])
-              fields))))
+        eid (ffirst results)]
+    (if eid
+      (let [entity (-> conn db (d/entity eid))]
+        (into {} (map
+                  (fn [field]
+                    [field (field entity)])
+                  fields))))))
+
+(defn put [thing]
+  (d/transact conn
+              [(merge {:db/id #db/id [db.part/soipf]} thing)]))
